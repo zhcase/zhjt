@@ -8,9 +8,15 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@antv/g2": "^4.1.30",
+    "@antv/g2plot": "^2.3.35",
+    "@jiaminghi/data-view": "^2.10.0",
     "core-js": "^3.6.5",
+    "axios": "^0.19.0",
+    "echarts": "^5.2.1",
     "vue": "^3.0.0",
     "vue-class-component": "^8.0.0-0",
+    "vue-echarts": "^6.0.0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"
   },
