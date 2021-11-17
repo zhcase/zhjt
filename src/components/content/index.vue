@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:15:10
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-17 16:39:00
+ * @LastEditTime: 2021-11-17 18:03:02
  * @FilePath: /zhjt/src/components/content/index.vue
 -->
 <template>
@@ -55,7 +55,7 @@
         font-weight: bold;
       "
     ></dv-border-box-11> -->
-    <div>
+    <!-- <div>
       <div
         style="
           width: 242px;
@@ -74,22 +74,13 @@
       <div
         style="
           width: 326px;
-          height: 230px;
-          padding:20px;
+          height: 180px;
+          padding: 20px;
           border: 2px solid #7eff00;
-          background: radial-gradient(
-            rgba(126, 255, 0, 0),
-            rgba(126, 255, 0, 0.2)
-          );
+          background-image: radial-gradient(rgba(126, 255, 0, 0), rgba(126, 255, 0, 0.3))
         "
       >
-        <div
-          style="
-            height: 80px;
-            width: 100%;
-            display: flex;
-          "
-        >
+        <div style="height: 80px; width: 100%; display: flex">
           <div style="height: 60px; width: 60px; margin-top: 10px">
             <img
               src="https://img1.baidu.com/it/u=1765464561,3100748160&fm=26&fmt=auto"
@@ -104,22 +95,48 @@
               color: #fffb07;
             "
           >
-            <ul style="margin-top:10px">
-              <li> &nbsp; 李倩 直线距离：1km</li>
+            <ul style="margin-top: 10px">
+              <li>&nbsp; 李倩 直线距离：1km</li>
               <li>NO.33654845413</li>
-              <li style="font-weight: 200;margin-left:20px"> 西安大区河北项目X据点</li>
+              <li style="font-weight: 400; margin-left: 20px">
+               &nbsp; 西安大区河北项目X据点
+              </li>
             </ul>
           </div>
         </div>
-        <div>
+        <div style="margin-top:20px">
           <ul>
-            <li > <span> 工单编号； </span>356544212 </li>
-            <li > <span> 工单编号； </span>356544212 </li>
-            <li > <span> 工单编号； </span>356544212 </li>
+            <li style="float: left; color: #fff">
+              <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                工单编号: </span
+              >356544212
+            </li>
+            <li style="float: left; margin-left: 20px;color: #fff">
+              <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                告警专业: </span
+              >356544212
+            </li>
+            <li style="float: left;margin-top:10px;color: #fff">
+              <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                地址信息: </span
+              >356544212
+            </li>
+
+            <li style="float: left; margin-left: 20px;margin-top:10px;color: #fff">
+              <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                供应商信息: </span
+              >356544212
+            </li>
+                <li style="float: left;margin-top:10px;color: #fff">
+              <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                告警原因: </span
+              >356544212
+            </li>
+            <li style="float: left;margin-top:10px;color: #fff;margin-left: 20px;cursor:pointer;color:rgba(255, 251, 7, 1)">点击查看详细信息 》 》</li>
           </ul>
         </div>
       </div>
-    </div>
+    </div> -->
     <div class="zhjt-map__title">
       <img src="@/assets/images/zhjt-title.png" />
     </div>
@@ -133,6 +150,9 @@
     </span>
     <div class="video-dialog">
       <!-- <VideoPlayer/> -->
+    </div>
+    <div class="user-info" style="position:absolute;top:200px">
+      <dv-border-box-11 title="详情内容" style="height:200px;width:500px"></dv-border-box-11>
     </div>
   </div>
 </template>
@@ -388,9 +408,9 @@ export default class Container extends Vue {
       tooltip: {
         trigger: "item",
         triggerOn: "click", //点击才会出现提示框
-        backgroundColor: "rgba(34, 52, 164, 0.3)",
-        borderColor: "#FFFFCC",
-        borderWidth: 0.5,
+        backgroundColor: "rgba(34, 52, 164, 0)",
+        borderColor: "rgba(0,0,0,0)",
+        // borderWidth: 0.5,
         showDelay: 0,
         hideDelay: 0,
         enterable: true,
@@ -404,14 +424,92 @@ export default class Container extends Vue {
           var res = "";
           var name = params.name;
           var value = params.value[2];
-          if (name != "") {
-            res =
-              "<span style='color:#fff;'>" +
-              name +
-              "</span><br/>项目数：" +
-              value;
-            return res;
-          }
+          // if (name != "") {
+          res = `<div>
+      <div
+        style="
+          width: 242px;
+          height: 35px;
+          background: #5db407;
+          font-size: 16px;
+          font-family: Microsoft YaHei;
+          font-weight: bold;
+          color: #ffffff;
+          line-height: 35px;
+          margin-bottom: 2px;
+        "
+      >
+        距离派单一小时三十分钟
+      </div>
+      <div
+        style="
+          width: 326px;
+          height: 180px;
+          padding: 20px;
+          border: 2px solid #7eff00;
+          background-image: radial-gradient(rgba(126, 255, 0, 0), rgba(126, 255, 0, 0.3))
+        "
+      >
+        <div style="height: 80px; width: 100%; display: flex">
+          <div style="height: 60px; width: 60px; margin-top: 10px">
+            <img
+              src="https://img1.baidu.com/it/u=1765464561,3100748160&fm=26&fmt=auto"
+              style="height: 60px; border-radius: 5px"
+            />
+          </div>
+          <div
+            style="
+              font-size: 16px;
+              font-family: Microsoft YaHei;
+              font-weight: bold;
+              color: #fffb07;
+            "
+          >
+            <ul style="margin-top: 10px">
+              <li>&nbsp; 李倩 直线距离：1km</li>
+              <li>NO.33654845413</li>
+              <li style="font-weight: 400; margin-left: 20px">
+               &nbsp; 西安大区河北项目X据点
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div style="margin-top:20px">
+          <ul>
+            <li style="float: left; color: #fff">
+              <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                工单编号: </span
+              >356544212
+            </li>
+            <li style="float: left; margin-left: 20px;color: #fff">
+              <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                告警专业: </span
+              >356544212
+            </li>
+            <li style="float: left;margin-top:10px;color: #fff">
+              <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                地址信息: </span
+              >356544212
+            </li>
+
+            <li style="float: left; margin-left: 20px;margin-top:10px;color: #fff">
+              <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                供应商信息: </span
+              >356544212
+            </li>
+                <li style="float: left;margin-top:10px;color: #fff">
+              <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                告警原因: </span
+              >356544212
+            </li>
+            <li style="float: left;margin-top:10px;color: #fff;margin-left: 20px;cursor:pointer;color:rgba(255, 251, 7, 1)">点击查看详细信息 》 》</li>
+          </ul>
+        </div>
+      </div>
+    </div>`;
+
+          // }
+          return res;
         },
       },
       visualMap: {
