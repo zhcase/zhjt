@@ -2,11 +2,46 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:15:10
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-12 15:01:03
+ * @LastEditTime: 2021-11-17 16:39:00
  * @FilePath: /zhjt/src/components/content/index.vue
 -->
 <template>
   <div class="zhjt-map">
+    <!-- <div
+      style="
+        width: 200px;
+        height: 100px;
+        border: 1px solid rgba(243, 65, 57, 1);
+      "
+    >
+      <div
+        style="
+          height: 50px;
+          width: 100%;
+          background: rgba(243, 65, 57, 1);
+          line-height: 50px;
+          font-family: Microsoft YaHei;
+          font-weight: bold;
+          color: #ffffff;
+          font-size: 16px;
+        "
+      >
+        哈尔滨运维检修组
+      </div>
+      <div
+        style="
+          height: 50px;
+          background: rgba(62, 11, 9, 1);
+          line-height: 50px;
+          font-family: Microsoft YaHei;
+          font-weight: bold;
+          color: #ffffff;
+          font-size: 18px;
+        "
+      >
+        95% 高
+      </div>
+    </div> -->
     <!-- <dv-border-box-11
       title="数字化运营监控中心"
       style="
@@ -20,27 +55,106 @@
         font-weight: bold;
       "
     ></dv-border-box-11> -->
+    <div>
+      <div
+        style="
+          width: 242px;
+          height: 35px;
+          background: #5db407;
+          font-size: 16px;
+          font-family: Microsoft YaHei;
+          font-weight: bold;
+          color: #ffffff;
+          line-height: 35px;
+          margin-bottom: 2px;
+        "
+      >
+        距离派单一小时三十分钟
+      </div>
+      <div
+        style="
+          width: 326px;
+          height: 230px;
+          padding:20px;
+          border: 2px solid #7eff00;
+          background: radial-gradient(
+            rgba(126, 255, 0, 0),
+            rgba(126, 255, 0, 0.2)
+          );
+        "
+      >
+        <div
+          style="
+            height: 80px;
+            width: 100%;
+            display: flex;
+          "
+        >
+          <div style="height: 60px; width: 60px; margin-top: 10px">
+            <img
+              src="https://img1.baidu.com/it/u=1765464561,3100748160&fm=26&fmt=auto"
+              style="height: 60px; border-radius: 5px"
+            />
+          </div>
+          <div
+            style="
+              font-size: 16px;
+              font-family: Microsoft YaHei;
+              font-weight: bold;
+              color: #fffb07;
+            "
+          >
+            <ul style="margin-top:10px">
+              <li> &nbsp; 李倩 直线距离：1km</li>
+              <li>NO.33654845413</li>
+              <li style="font-weight: 200;margin-left:20px"> 西安大区河北项目X据点</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <ul>
+            <li > <span> 工单编号； </span>356544212 </li>
+            <li > <span> 工单编号； </span>356544212 </li>
+            <li > <span> 工单编号； </span>356544212 </li>
+          </ul>
+        </div>
+      </div>
+    </div>
     <div class="zhjt-map__title">
-      <img src="@/assets/images/zhjt-title.png"/>
+      <img src="@/assets/images/zhjt-title.png" />
+    </div>
+    <div class="zhjt-map__time">
+      <span>{{ currentTime[0] }} </span> <span>{{ currentTime[1] }}</span>
     </div>
 
-    <div ref="map" style="width: 100%; height: 600px; margin-top: 100px">
-      2323
+    <div ref="map" style="width: 100%; height: 600px; margin-top: 50px"></div>
+    <span class="video-player">
+      <img src="@/assets/images/video-d.png" />
+    </span>
+    <div class="video-dialog">
+      <!-- <VideoPlayer/> -->
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue } from "vue-class-component";
+import { Options, Vue } from "vue-class-component";
 import { Account } from "@/api/index";
+import VideoPlayer from "./components/videoPlayer.vue";
 import * as echarts from "echarts";
 // requestIdleCallback
 import "@/assets/json/china";
 // require("https://cdn.jsdelivr.net/npm/echarts/map/js/china.js?v=1598903772045");
 
+@Options({
+  components: {
+    VideoPlayer,
+  },
+})
 export default class Container extends Vue {
   // 坐标对应的值
   z: any;
+  currentTime: string[] = [];
   // 地图坐标
   cyfztx_date_n = {
     geoCoordMap: {
@@ -81,8 +195,29 @@ export default class Container extends Vue {
       [{ name: "黑龙江", value: 7 }, { name: "沈阳" }],
     ],
   };
+
+  // 获取当前时间
+  getCurrentDate() {
+    let d = new Date();
+    let year = d.getFullYear();
+    let month: any = d.getMonth();
+    month = month + 1 > 12 ? 1 : month + 1;
+    month = month > 9 ? month : "0" + month.toString();
+    let day = d.getDate();
+    let hour: any = d.getHours();
+    hour = hour > 9 ? hour : "0" + hour.toString();
+    let minute: any = d.getMinutes();
+    minute = minute > 9 ? minute : "0" + minute.toString();
+    let second: any = d.getSeconds();
+    second = second > 9 ? second : "0" + second.toString();
+    return [`${year}-${month}-${day}`, `${hour}:${minute}:${second}`];
+  }
+
   mounted() {
     this.initMap();
+    setInterval(() => {
+      this.currentTime = this.getCurrentDate();
+    });
   }
   convertData(data: any) {
     // var res = [];
@@ -114,7 +249,8 @@ export default class Container extends Vue {
       var res = [];
       for (var i = 0; i < datevalue.length; i++) {
         var dataItem: any = datevalue[i];
-        var fromCoord = datemap[dataItem[0].name];
+        // var fromCoord = datemap[dataItem[0].name];
+        var fromCoord = "";
         var toCoord = datemap[dataItem[1].name];
         if (fromCoord && toCoord) {
           res.push([
@@ -165,8 +301,8 @@ export default class Container extends Vue {
           rippleEffect: {
             //涟漪特效
             period: 4, //动画时间，值越小速度越快
-            brushType: "stroke", //波纹绘制方式 stroke, fill
-            scale: 4, //波纹圆环最大限制，值越大波纹越大
+            brushType: "fill", //波纹绘制方式 stroke, fill
+            scale: 8, //波纹圆环最大限制，值越大波纹越大
           },
           label: {
             normal: {
@@ -195,7 +331,7 @@ export default class Container extends Vue {
           },
           data: item[2].map(function (dataItem: any) {
             return {
-              name: dataItem[0].name,
+              // name: dataItem[0].name,
               value: datemap[dataItem[0].name].concat([dataItem[0].value]),
             };
           }),
@@ -222,8 +358,8 @@ export default class Container extends Vue {
               color: "#FF6A6A",
             },
           },
-          symbol: "pin",
-          symbolSize: 30,
+          symbol: "",
+          symbolSize: 10,
           itemStyle: {
             normal: {
               show: true,
@@ -236,7 +372,7 @@ export default class Container extends Vue {
           },
           data: [
             {
-              name: item[0],
+              // name: item[0],
               value: datemap[item[0]].concat([100]),
               visualMap: false,
             },
@@ -251,10 +387,10 @@ export default class Container extends Vue {
       backgroundColor: "rgba(34, 52, 164, 0)",
       tooltip: {
         trigger: "item",
+        triggerOn: "click", //点击才会出现提示框
         backgroundColor: "rgba(34, 52, 164, 0.3)",
         borderColor: "#FFFFCC",
         borderWidth: 0.5,
-
         showDelay: 0,
         hideDelay: 0,
         enterable: true,
@@ -262,6 +398,8 @@ export default class Container extends Vue {
         extraCssText: "z-index:100",
         formatter: function (params: { name: any; value: any[] }) {
           console.log(params);
+          console.log(12323);
+
           //根据业务自己拓展要显示的内容
           var res = "";
           var name = params.name;
@@ -383,13 +521,46 @@ export default class Container extends Vue {
 }
 </script>
 
-
-<style lang='scss' scoped>
-.zhjt-map{
-  &__title{
-    margin:20px 0;
-    img{
+<style lang="scss" scoped>
+.zhjt-map {
+  position: relative;
+  &__title {
+    margin: 20px 0;
+    img {
       height: 80px;
+    }
+  }
+  .video-dialog {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
+  .video-player {
+    position: absolute;
+    left: 20px;
+    bottom: 30px;
+    display: inline-block;
+    height: 50px;
+    width: 50px;
+    z-index: 999;
+    img {
+      height: 50px;
+    }
+  }
+  &__time {
+    span {
+      display: inline-block;
+      margin-left: 20px;
+      line-height: 50px;
+      text-align: center;
+      font-size: 24px;
+      font-family: YouSheBiaoTiHei;
+      font-weight: bold;
+      color: #ffffff;
+      height: 50px;
+      width: 200px;
+      background-image: url("~@/assets/images/time-bg.png");
+      background-size: 200px 50px;
     }
   }
 }

@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:18:52
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-12 16:58:14
+ * @LastEditTime: 2021-11-16 11:40:17
  * @FilePath: /zhjt/src/components/container/index.vue
 -->
 <template>
@@ -708,9 +708,11 @@ export default class Container extends Vue {
       },
       legend: {
         data: ["Line 2", "Line 3"],
+        left: "0%",
+        top: "5%",
         textStyle: {
           color: "#fff",
-          
+          display: "block",
         },
       },
       toolbox: {
@@ -803,7 +805,7 @@ export default class Container extends Vue {
     option && myChart.setOption(option);
   }
   initCarCharts() {
-    const stackedColumnPlot = new Column("CarChart", {
+    let stackedColumnPlot: any = new Column("CarChart", {
       data: this.carDatas,
       isGroup: true,
       xField: "月份",
@@ -812,6 +814,12 @@ export default class Container extends Vue {
       seriesField: "name",
       /** 设置颜色 */
       color: ["#4195E3FF", "#FC41A8FF"],
+      // textStyle: {},
+      // legend: {
+      //   textStyle: {
+      //     color: "#fff",
+      //   },
+      // },
       /** 设置间距 */
       // marginRatio: 0.1,
       //   label: {
@@ -871,12 +879,13 @@ export default class Container extends Vue {
   height: 276px;
   position: relative;
   /* padding: 20px; */
-  
-  .box-title,.oil-title {
+
+  .box-title,
+  .oil-title {
     min-width: 133px;
-    padding:0 10px;
+    padding: 0 10px;
     height: 40px;
-   background: #0A3D66;
+    background: #0a3d66;
     box-shadow: 0px 8px 204px 0px rgba(1, 35, 59, 0.5);
     border-radius: 4px;
     font-size: 18px;
@@ -888,16 +897,15 @@ export default class Container extends Vue {
     font-weight: bold;
     color: #aaddff;
     display: inline-block;
-    i{
-       width: 8px;
+    i {
+      width: 8px;
       margin-right: 5px;
       float: left;
-      margin-top:10px;
+      margin-top: 10px;
       height: 18px;
       /* display: inline-block; */
       background: rgba(252, 65, 168, 1);
     }
-
   }
 }
 .oil-title {

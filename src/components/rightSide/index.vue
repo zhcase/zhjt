@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 15:07:04
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-12 16:42:52
+ * @LastEditTime: 2021-11-16 11:22:21
  * @FilePath: /zhjt/src/components/rightSide/index.vue
 -->
 <template>
@@ -12,24 +12,41 @@
       class="l-side__abnormal__content"
       backgroundColor="rgba(20,87,140, 0.29)"
     >
-      <!-- <span class="silde-right-line"
-        ><dv-decoration-10 :reverse="true" style="height: 205px; width: 5px" />
-      </span> -->
-      <div class="work-ratio">
-        <span class="work-ratio__info">
-          <dv-decoration-11
-            style="width: 80px; height: 50px"
-          ></dv-decoration-11>
-        </span>
+      <!-- 工作量标题 -->
 
-        <dv-decoration-9 style="width: 150px; height: 150px; margin: 0 auto">
-          <dv-digital-flop
-            :config="config"
-            style="width: 200px; height: 50px; margin: 0 auto"
-          />
-        </dv-decoration-9>
+      <div class="workload-title">
+        <img src="@/assets/images/work-title.png" /> <font>工作量占比</font>
       </div>
-      <div style="height: 65px"></div>
+      <div class="workload-content">
+        <!-- 左上角 -->
+        <font class="desc top-left">
+          <font class="name">常规工时</font>
+          <font class="num">56 <i class="icon"><img src='@/assets/images/down.png'/></i></font>
+        </font>
+        <!-- 右上角 -->
+        <font class="desc top-right">
+          <font class="name">合同内</font>
+          <font class="num">56 <i class="icon"></i></font>
+        </font>
+        <!-- 左下角 -->
+        <font class="desc b-left">
+            <font class="num">56 <i class="icon"></i></font>
+          <font class="name">合同内</font>
+        
+        </font>
+        <!-- 右下角 -->
+         <font class="desc b-right">
+         
+          <font class="num">56 <i class="icon"></i></font>
+           <font class="name">合同内</font>
+        </font>
+        <div
+          class="workload-content-echarts"
+          id="workload-echarts"
+          ref="workload"
+          style="height: 200px; width: 200px; margin: 0 auto"
+        ></div>
+      </div>
     </dv-border-box-12>
     <dv-border-box-12
       :reverse="true"
@@ -82,7 +99,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
+import { Vue } from "vue-class-component";
 import * as echarts from "echarts";
 
 export default class Container extends Vue {
@@ -147,11 +164,23 @@ export default class Container extends Vue {
     "#F57474",
     "#F57474",
   ];
+  workloadCharts: any = "";
+  // 工作效率角度
+  angle = 0;
   mounted() {
+    var chartDom: any = this.$refs.workload;
+    this.workloadCharts = echarts.init(chartDom);
     this.workEfficEcharts();
     this.oliMonitoring();
     this.rankingEcharts();
+
+    setInterval(() => {
+      //用setInterval做动画感觉有问题
+      this.initWorkloadEcharts();
+    }, 50);
   }
+  //获取圆上面某点的坐标(x0,y0表示坐标，r半径，angle角度)
+
   attackSourcesDataFmt(sData: any) {
     var sss: any = [];
     sData.forEach((item: any, i: any) => {
@@ -167,6 +196,385 @@ export default class Container extends Vue {
       });
     });
     return sss;
+  }
+
+  // draw() {
+
+  //   //window.requestAnimationFrame(draw);
+  // }
+  // 工作量占比 echarts 初始化
+  initWorkloadEcharts() {
+    function getCirlPoint(x0: number, y0: number, r: number, angle: number) {
+      let x1 = x0 + r * Math.cos((angle * Math.PI) / 180);
+      let y1 = y0 + r * Math.sin((angle * Math.PI) / 180);
+      return {
+        x: x1,
+        y: y1,
+      };
+    }
+    let angle = this.angle; //角度，用来做简单的动画效果的
+    let value = 55.33;
+
+    let option = {
+      backgroundColor: "#03275b",
+      title: {
+        text: "{a|" + value + "}{c|%}",
+        x: "center",
+        y: "center",
+        textStyle: {
+          rich: {
+            a: {
+              fontSize: 18,
+              color: "#29EEF3",
+              fontWeight: "bold",
+            },
+
+            c: {
+              fontSize: 20,
+              color: "#ffffff",
+              // padding: [5,0]
+            },
+          },
+        },
+      },
+
+      series: [
+        // 紫色
+        {
+          name: "ring5",
+          type: "custom",
+          coordinateSystem: "none",
+          renderItem: function (
+            params: any,
+            api: { getWidth: () => number; getHeight: () => number }
+          ) {
+            return {
+              type: "arc",
+              shape: {
+                cx: api.getWidth() / 2,
+                cy: api.getHeight() / 2,
+                r: (Math.min(api.getWidth(), api.getHeight()) / 2) * 0.6,
+                startAngle: ((0 + angle) * Math.PI) / 180,
+                endAngle: ((90 + angle) * Math.PI) / 180,
+              },
+              style: {
+                stroke: "rgba(26, 201, 255, 1)",
+                fill: "transparent",
+                lineWidth: 1.5,
+              },
+              silent: true,
+            };
+          },
+          data: [0],
+        },
+        {
+          name: "ring5", //紫点
+          type: "custom",
+          coordinateSystem: "none",
+          renderItem: function (
+            params: any,
+            api: { getWidth: () => number; getHeight: () => number }
+          ) {
+            let x0 = api.getWidth() / 2;
+            let y0 = api.getHeight() / 2;
+            let r = (Math.min(api.getWidth(), api.getHeight()) / 2) * 0.6;
+            let point = getCirlPoint(x0, y0, r, 90 + angle);
+            return {
+              type: "circle",
+              shape: {
+                cx: point.x,
+                cy: point.y,
+                r: 4,
+              },
+              style: {
+                stroke: "rgba(26, 201, 255, 1)", //绿
+                fill: "rgba(26, 201, 255, 1)",
+              },
+              silent: true,
+            };
+          },
+          data: [0],
+        },
+        // 蓝色
+
+        {
+          name: "ring5",
+          type: "custom",
+          coordinateSystem: "none",
+          renderItem: function (
+            params: any,
+            api: { getWidth: () => number; getHeight: () => number }
+          ) {
+            return {
+              type: "arc",
+              shape: {
+                cx: api.getWidth() / 2,
+                cy: api.getHeight() / 2,
+                r: (Math.min(api.getWidth(), api.getHeight()) / 2) * 0.6,
+                startAngle: ((180 + angle) * Math.PI) / 180,
+                endAngle: ((270 + angle) * Math.PI) / 180,
+              },
+              style: {
+                stroke: "rgba(26, 201, 255, 1)",
+                fill: "transparent",
+                lineWidth: 1.5,
+              },
+              silent: true,
+            };
+          },
+          data: [0],
+        },
+        {
+          name: "ring5", // 蓝色
+          type: "custom",
+          coordinateSystem: "none",
+          renderItem: function (
+            params: any,
+            api: { getWidth: () => number; getHeight: () => number }
+          ) {
+            let x0 = api.getWidth() / 2;
+            let y0 = api.getHeight() / 2;
+            let r = (Math.min(api.getWidth(), api.getHeight()) / 2) * 0.6;
+            let point = getCirlPoint(x0, y0, r, 180 + angle);
+            return {
+              type: "circle",
+              shape: {
+                cx: point.x,
+                cy: point.y,
+                r: 4,
+              },
+              style: {
+                stroke: "rgba(26, 201, 255, 1)", //绿
+                fill: "rgba(26, 201, 255, 1)",
+              },
+              silent: true,
+            };
+          },
+          data: [0],
+        },
+
+        {
+          name: "ring5",
+          type: "custom",
+          coordinateSystem: "none",
+          renderItem: function (
+            params: any,
+            api: { getWidth: () => number; getHeight: () => number }
+          ) {
+            return {
+              type: "arc",
+              shape: {
+                cx: api.getWidth() / 2,
+                cy: api.getHeight() / 2,
+                r: (Math.min(api.getWidth(), api.getHeight()) / 2) * 0.65,
+                startAngle: ((270 + -angle) * Math.PI) / 180,
+                endAngle: ((40 + -angle) * Math.PI) / 180,
+              },
+              style: {
+                stroke: "rgba(26, 201, 255, 1)",
+                fill: "transparent",
+                lineWidth: 1.5,
+              },
+              silent: true,
+            };
+          },
+          data: [0],
+        },
+        // 橘色
+
+        {
+          name: "ring5",
+          type: "custom",
+          coordinateSystem: "none",
+          renderItem: function (
+            params: any,
+            api: { getWidth: () => number; getHeight: () => number }
+          ) {
+            return {
+              type: "arc",
+              shape: {
+                cx: api.getWidth() / 2,
+                cy: api.getHeight() / 2,
+                r: (Math.min(api.getWidth(), api.getHeight()) / 2) * 0.65,
+                startAngle: ((90 + -angle) * Math.PI) / 180,
+                endAngle: ((220 + -angle) * Math.PI) / 180,
+              },
+              style: {
+                stroke: "rgba(26, 201, 255, 1)",
+                fill: "transparent",
+                lineWidth: 1.5,
+              },
+              silent: true,
+            };
+          },
+          data: [0],
+        },
+        {
+          name: "ring5",
+          type: "custom",
+          coordinateSystem: "none",
+          renderItem(
+            params: any,
+            api: { getWidth: () => number; getHeight: () => number }
+          ) {
+            let x0 = api.getWidth() / 2;
+            let y0 = api.getHeight() / 2;
+            let r = (Math.min(api.getWidth(), api.getHeight()) / 2) * 0.65;
+            let point = getCirlPoint(x0, y0, r, 90 + -angle);
+            return {
+              type: "circle",
+              shape: {
+                cx: point.x,
+                cy: point.y,
+                r: 4,
+              },
+              style: {
+                stroke: "rgba(26, 201, 255, 1)", //粉
+                fill: "rgba(26, 201, 255, 1)",
+              },
+              silent: true,
+            };
+          },
+          data: [0],
+        },
+        {
+          name: "ring5", //绿点
+          type: "custom",
+          coordinateSystem: "none",
+          renderItem: function (
+            params: any,
+            api: { getWidth: () => number; getHeight: () => number }
+          ) {
+            let x0 = api.getWidth() / 2;
+            let y0 = api.getHeight() / 2;
+            let r = (Math.min(api.getWidth(), api.getHeight()) / 2) * 0.65;
+            let point = getCirlPoint(x0, y0, r, 270 + -angle);
+            return {
+              type: "circle",
+              shape: {
+                cx: point.x,
+                cy: point.y,
+                r: 4,
+              },
+              style: {
+                stroke: "rgba(26, 201, 255, 1)", //绿
+                fill: "rgba(26, 201, 255, 1)",
+              },
+              silent: true,
+            };
+          },
+          data: [0],
+        },
+        {
+          name: "吃猪肉频率",
+          type: "pie",
+          radius: ["52%", "40%"],
+          silent: true,
+          clockwise: true,
+          startAngle: 90,
+          z: 0,
+          zlevel: 0,
+          label: {
+            normal: {
+              position: "center",
+            },
+          },
+          data: [
+            {
+              value: value,
+              name: "",
+              itemStyle: {
+                normal: {
+                  color: {
+                    // 完成的圆环的颜色
+                    colorStops: [
+                      {
+                        offset: 0,
+                        color: "rgba(26, 201, 255, 1)", // 0% 处的颜色
+                      },
+
+                      {
+                        offset: 1,
+                        color: "rgba(26, 201, 255, 1)", // 100% 处的颜色
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+            {
+              value: 100 - value,
+              name: "",
+              label: {
+                normal: {
+                  show: false,
+                },
+              },
+              itemStyle: {
+                normal: {
+                  color: "#173164",
+                },
+              },
+            },
+          ],
+        },
+        {
+          name: "吃猪肉频率",
+          type: "pie",
+          radius: ["32%", "35%"],
+          silent: true,
+          clockwise: true,
+          startAngle: 270,
+          z: 0,
+          zlevel: 0,
+          label: {
+            normal: {
+              position: "center",
+            },
+          },
+          data: [
+            {
+              value: value,
+              name: "",
+              itemStyle: {
+                normal: {
+                  color: {
+                    // 完成的圆环的颜色
+                    colorStops: [
+                      {
+                        offset: 0,
+                        color: "rgba(0,0,0,0)", // 0% 处的颜色
+                      },
+                      {
+                        offset: 1,
+                        color: "rgba(0,0,0,0)", // 0% 处的颜色
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+            {
+              value: 100 - value,
+              name: "",
+              label: {
+                normal: {
+                  show: false,
+                },
+              },
+              itemStyle: {
+                normal: {
+                  color: "#173164",
+                },
+              },
+            },
+          ],
+        },
+      ],
+    };
+    this.angle = angle + 3;
+    // myChart.setOption(option, true);
+    option && this.workloadCharts.setOption(option);
   }
   // 排名
   rankingEcharts() {
@@ -417,6 +825,8 @@ export default class Container extends Vue {
       },
       legend: {
         data: ["Line 2", "Line 3"],
+         left:'0%',
+        top:'5%',
         textStyle: {
           color: "#fff",
         },
@@ -629,7 +1039,71 @@ export default class Container extends Vue {
       opacity: 0;
     }
   }
+  // .{
+  //       background-image: url("~@/assets/images/top-left.png");
 
+  // }
+  .workload-title {
+    height: 40px;
+    line-height: 40px;
+    text-align: left;
+    width: 100%;
+    img {
+      height: 25px;
+      text-align: left;
+      float: left;
+      margin-top: 7.5px;
+    }
+    font {
+      color: rgba(26, 201, 255, 1);
+      margin-left: 5px;
+      font-size: 17px;
+      font-family: Microsoft YaHei;
+      font-weight: bold;
+    }
+  }
+  .workload-content {
+    position: relative;
+    .desc {
+      display: inline-block;
+      background-size: 100px 40px;
+      width: 100px;
+      height: 40px;
+      position: absolute;
+      z-index: 99;
+      .name {
+        color: #fff;
+      }
+      .num {
+        display: block;
+        color: #fff;
+        img{
+          height: 15px;
+        }
+      }
+    }
+    .b-left {
+      background-image: url("~@/assets/images/b-left.png");
+      bottom: 0px;
+      left: 30px;
+      // border: 1px solid red;
+    }
+      .b-right {
+      background-image: url("~@/assets/images/b-right.png");
+      bottom: 0px;
+      right: 30px;
+      // border: 1px solid red;
+    }
+    .top-right {
+      background-image: url("~@/assets/images/top-right.png");
+      right: 30px;
+    }
+    .top-left {
+      background-image: url("~@/assets/images/top-left.png");
+      left: 30px;
+      // border: 1px solid red;
+    }
+  }
   span {
     width: 133px;
     height: 40px;
