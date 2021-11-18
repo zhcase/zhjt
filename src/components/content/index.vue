@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:15:10
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-17 18:03:02
+ * @LastEditTime: 2021-11-18 17:40:02
  * @FilePath: /zhjt/src/components/content/index.vue
 -->
 <template>
@@ -151,8 +151,9 @@
     <div class="video-dialog">
       <!-- <VideoPlayer/> -->
     </div>
-    <div class="user-info" style="position:absolute;top:200px">
-      <dv-border-box-11 title="详情内容" style="height:200px;width:500px"></dv-border-box-11>
+    <div class="user-info" style="position: absolute; top: 50px" v-if="false" >
+    
+        <userDetail/>
     </div>
   </div>
 </template>
@@ -161,6 +162,7 @@
 import { Options, Vue } from "vue-class-component";
 import { Account } from "@/api/index";
 import VideoPlayer from "./components/videoPlayer.vue";
+import userDetail from './components/userDetail.vue';
 import * as echarts from "echarts";
 // requestIdleCallback
 import "@/assets/json/china";
@@ -169,6 +171,7 @@ import "@/assets/json/china";
 @Options({
   components: {
     VideoPlayer,
+    userDetail
   },
 })
 export default class Container extends Vue {
@@ -197,12 +200,12 @@ export default class Container extends Vue {
       天津: [117.2, 39.13],
     },
     BJData: [
-      [{ name: "中国台湾", value: 21 }, { name: "沈阳" }],
-      [{ name: "中国香港", value: 101 }, { name: "沈阳" }],
-      [{ name: "中国澳门", value: 2 }, { name: "沈阳" }],
-      [{ name: "北京", value: 12 }, { name: "沈阳" }],
-      [{ name: "上海", value: 1 }, { name: "沈阳" }],
-      [{ name: "重庆", value: 1 }, { name: "沈阳" }],
+      [{ name: "中国台湾", value: 21 },],
+      [{ name: "中国香港", value: 101 }, ],
+      [{ name: "中国澳门", value: 2 }],
+      [{ name: "北京", value: 12 }],
+      [{ name: "上海", value: 1 }],
+      [{ name: "重庆", value: 1 }],
       [{ name: "天津", value: 1 }, { name: "沈阳" }],
       [{ name: "陕西", value: 3 }, { name: "沈阳" }],
       [{ name: "甘肃", value: 4 }, { name: "沈阳" }],
@@ -232,12 +235,21 @@ export default class Container extends Vue {
     second = second > 9 ? second : "0" + second.toString();
     return [`${year}-${month}-${day}`, `${hour}:${minute}:${second}`];
   }
-
+  created() {
+    console.log((window as any).handleShowInfo);
+    console.log(12323);
+    
+    (window as any).handleShowInfo = (this as any).handleShowInfos;
+  }
   mounted() {
     this.initMap();
     setInterval(() => {
       this.currentTime = this.getCurrentDate();
     });
+  }
+
+  handleShowInfos() {
+    alert(1232);
   }
   convertData(data: any) {
     // var res = [];
@@ -252,63 +264,64 @@ export default class Container extends Vue {
     // }
     // return res;
   }
+
   // 初始化展示地图
   async initMap() {
     let result = await Account.getCityList();
-    console.log(result);
+
 
     //   console.log($);
     var chartDom: any = this.$refs.map;
     var myChart = echarts.init(chartDom);
     var datemap: any = this.cyfztx_date_n.geoCoordMap;
     var datevalue = this.cyfztx_date_n.BJData;
-    var convertData = function (
-      datemap: { [x: string]: any },
-      datevalue: string | any[]
-    ) {
-      var res = [];
-      for (var i = 0; i < datevalue.length; i++) {
-        var dataItem: any = datevalue[i];
-        // var fromCoord = datemap[dataItem[0].name];
-        var fromCoord = "";
-        var toCoord = datemap[dataItem[1].name];
-        if (fromCoord && toCoord) {
-          res.push([
-            {
-              coord: fromCoord,
-              value: dataItem[0].value,
-            },
-            {
-              coord: toCoord,
-            },
-          ]);
-        }
-      }
-      return res;
-    };
-    var convertData2 = function (
-      datemap: { [x: string]: any },
-      datevalue: string | any[]
-    ) {
-      var res = [];
-      for (var i = 0; i < datevalue.length; i++) {
-        var dataItem = datevalue[i];
-        var fromCoord = datemap[dataItem[1].name];
-        var toCoord = datemap[dataItem[0].name];
-        if (fromCoord && toCoord) {
-          res.push([
-            {
-              coord: fromCoord,
-              value: dataItem[0].value,
-            },
-            {
-              coord: toCoord,
-            },
-          ]);
-        }
-      }
-      return res;
-    };
+    // var convertData = function (
+    //   datemap: { [x: string]: any },
+    //   datevalue: string | any[]
+    // ) {
+    //   var res = [];
+    //   for (var i = 0; i < datevalue.length; i++) {
+    //     var dataItem: any = datevalue[i];
+    //     // var fromCoord = datemap[dataItem[0].name];
+    //     var fromCoord = "";
+    //     var toCoord = datemap[dataItem[1].name];
+    //     if (fromCoord && toCoord) {
+    //       res.push([
+    //         {
+    //           coord: fromCoord,
+    //           value: dataItem[0].value,
+    //         },
+    //         {
+    //           coord: toCoord,
+    //         },
+    //       ]);
+    //     }
+    //   }
+    //   return res;
+    // };
+    // var convertData2 = function (
+    //   datemap: { [x: string]: any },
+    //   datevalue: string | any[]
+    // ) {
+    //   var res = [];
+    //   for (var i = 0; i < datevalue.length; i++) {
+    //     var dataItem = datevalue[i];
+    //     var fromCoord = datemap[dataItem[1].name];
+    //     var toCoord = datemap[dataItem[0].name];
+    //     if (fromCoord && toCoord) {
+    //       res.push([
+    //         {
+    //           coord: fromCoord,
+    //           value: dataItem[0].value,
+    //         },
+    //         {
+    //           coord: toCoord,
+    //         },
+    //       ]);
+    //     }
+    //   }
+    //   return res;
+    // };
 
     var series: any = [];
     [["沈阳", datemap, datevalue]].forEach(function (item, i) {
@@ -502,7 +515,7 @@ export default class Container extends Vue {
                 告警原因: </span
               >356544212
             </li>
-            <li style="float: left;margin-top:10px;color: #fff;margin-left: 20px;cursor:pointer;color:rgba(255, 251, 7, 1)">点击查看详细信息 》 》</li>
+            <li style="float: left;margin-top:10px;color: #fff;margin-left: 20px;cursor:pointer;color:rgba(255, 251, 7, 1)" onclick='handleShowInfo()'>点击查看详细信息 》 》</li>
           </ul>
         </div>
       </div>
@@ -547,7 +560,7 @@ export default class Container extends Vue {
             },
           },
         },
-        roam: true, //是否允许缩放
+        roam: false, //是否允许缩放
         layoutCenter: ["49%", "50%"], //地图位置
         layoutSize: "120%",
         itemStyle: {
@@ -615,6 +628,28 @@ export default class Container extends Vue {
       series: series,
     };
     option && myChart.setOption(option);
+        //点击前解绑，防止点击事件触发多次
+    myChart.off('click');
+    myChart.on('click', echartsMapClick);
+    function echartsMapClick(params:any) {
+      console.log(params);
+      
+    // alert(12);
+    if (!params.data) {
+        return;
+    } else {
+        //如果当前是最后一级，那就直接return
+        // if (parentInfo[parentInfo.length - 1].code == params.data.cityCode) {
+        //     return;
+        // }
+        // let data = params.data;
+        // parentInfo.push({
+        //     cityName: data.name,
+        //     code: data.cityCode,
+        // });
+        // init(data.cityCode);
+    }
+    }
   }
 }
 </script>
