@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:15:10
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-18 17:40:02
+ * @LastEditTime: 2021-11-19 17:07:50
  * @FilePath: /zhjt/src/components/content/index.vue
 -->
 <template>
@@ -144,40 +144,44 @@
       <span>{{ currentTime[0] }} </span> <span>{{ currentTime[1] }}</span>
     </div>
 
-    <div ref="map" style="width: 100%; height: 600px; margin-top: 50px"></div>
+    <div ref="map" style="width: 800px; height: 800px; margin-top: 50px" v-if="isMap" id='map'></div>
     <span class="video-player">
       <img src="@/assets/images/video-d.png" />
     </span>
     <div class="video-dialog">
       <!-- <VideoPlayer/> -->
     </div>
-    <div class="user-info" style="position: absolute; top: 50px" v-if="false" >
-    
-        <userDetail/>
+    <div class="user-info" style="position: absolute; top: 50px" v-if="false">
+      <userDetail />
     </div>
   </div>
 </template>
 
-<script lang="ts">
+<script>
+/* tslint:disable  */
+
 import { Options, Vue } from "vue-class-component";
 import { Account } from "@/api/index";
 import VideoPlayer from "./components/videoPlayer.vue";
-import userDetail from './components/userDetail.vue';
+import userDetail from "./components/userDetail.vue";
+import axios from "axios";
 import * as echarts from "echarts";
 // requestIdleCallback
 import "@/assets/json/china";
+const beijing = require("@/static/beijing.json");
+
 // require("https://cdn.jsdelivr.net/npm/echarts/map/js/china.js?v=1598903772045");
 
 @Options({
   components: {
     VideoPlayer,
-    userDetail
+    userDetail,
   },
 })
 export default class Container extends Vue {
   // 坐标对应的值
-  z: any;
-  currentTime: string[] = [];
+  currentTime = [];
+  isMap=true;
   // 地图坐标
   cyfztx_date_n = {
     geoCoordMap: {
@@ -198,24 +202,25 @@ export default class Container extends Vue {
       上海: [121.48, 31.22],
       重庆: [106.54, 29.59],
       天津: [117.2, 39.13],
+      苦苦哈利: [115.864528, 28.687675],
     },
     BJData: [
-      [{ name: "中国台湾", value: 21 },],
-      [{ name: "中国香港", value: 101 }, ],
-      [{ name: "中国澳门", value: 2 }],
-      [{ name: "北京", value: 12 }],
-      [{ name: "上海", value: 1 }],
-      [{ name: "重庆", value: 1 }],
-      [{ name: "天津", value: 1 }, { name: "沈阳" }],
-      [{ name: "陕西", value: 3 }, { name: "沈阳" }],
-      [{ name: "甘肃", value: 4 }, { name: "沈阳" }],
-      [{ name: "四川", value: 1 }, { name: "沈阳" }],
-      [{ name: "河北", value: 6 }, { name: "沈阳" }],
-      [{ name: "湖北", value: 7 }, { name: "沈阳" }],
-      [{ name: "湖南", value: 1 }, { name: "沈阳" }],
-      [{ name: "浙江", value: 3 }, { name: "沈阳" }],
-      [{ name: "安徽", value: 8 }, { name: "沈阳" }],
-      [{ name: "黑龙江", value: 7 }, { name: "沈阳" }],
+      // [{ name: "中国台湾", value: 21 }],
+      // [{ name: "中国香港", value: 101 }],
+      // [{ name: "中国澳门", value: 2 }],
+      // [{ name: "北京", value: 12 }],
+      // [{ name: "上海", value: 1 }],
+      // [{ name: "重庆", value: 1 }],
+      // [{ name: "天津", value: 1 }, { name: "沈阳" }],
+      // [{ name: "陕西", value: 3 }, { name: "沈阳" }],
+      // [{ name: "甘肃", value: 4 }, { name: "沈阳" }],
+      // [{ name: "四川", value: 1 }, { name: "沈阳" }],
+      // [{ name: "河北", value: 6 }, { name: "沈阳" }],
+      // [{ name: "湖北", value: 7 }, { name: "沈阳" }],
+      // [{ name: "湖南", value: 1 }, { name: "沈阳" }],
+      // [{ name: "浙江", value: 3 }, { name: "沈阳" }],
+      // [{ name: "安徽", value: 8 }, { name: "沈阳" }],
+      // [{ name: "黑龙江", value: 7 }, { name: "沈阳" }],
     ],
   };
 
@@ -223,26 +228,24 @@ export default class Container extends Vue {
   getCurrentDate() {
     let d = new Date();
     let year = d.getFullYear();
-    let month: any = d.getMonth();
+    let month = d.getMonth();
     month = month + 1 > 12 ? 1 : month + 1;
     month = month > 9 ? month : "0" + month.toString();
     let day = d.getDate();
-    let hour: any = d.getHours();
+    let hour = d.getHours();
     hour = hour > 9 ? hour : "0" + hour.toString();
-    let minute: any = d.getMinutes();
+    let minute = d.getMinutes();
     minute = minute > 9 ? minute : "0" + minute.toString();
-    let second: any = d.getSeconds();
+    let second = d.getSeconds();
     second = second > 9 ? second : "0" + second.toString();
     return [`${year}-${month}-${day}`, `${hour}:${minute}:${second}`];
   }
   created() {
-    console.log((window as any).handleShowInfo);
-    console.log(12323);
-    
-    (window as any).handleShowInfo = (this as any).handleShowInfos;
+    window.handleShowInfo = this.handleShowInfos;
   }
   mounted() {
     this.initMap();
+
     setInterval(() => {
       this.currentTime = this.getCurrentDate();
     });
@@ -251,7 +254,7 @@ export default class Container extends Vue {
   handleShowInfos() {
     alert(1232);
   }
-  convertData(data: any) {
+  convertData(data) {
     // var res = [];
     // for (var i = 0; i < data.length; i++) {
     //   var geoCoord = this.geoCoordMap[data[i].name];
@@ -266,15 +269,20 @@ export default class Container extends Vue {
   }
 
   // 初始化展示地图
-  async initMap() {
-    let result = await Account.getCityList();
-
+  initMap(name) {
+    this.isMap=true;
+    // if (name) {
+      // echarts.registerMap("china", beijing);
+    // }
+    // let result = await Account.getProvinces("北京");
+    // console.log(result);
 
     //   console.log($);
-    var chartDom: any = this.$refs.map;
-    var myChart = echarts.init(chartDom);
-    var datemap: any = this.cyfztx_date_n.geoCoordMap;
+    var chartDom = this.$refs.map;
+    var myChart = echarts.init(document.getElementById("map"));
+    var datemap = this.cyfztx_date_n.geoCoordMap;
     var datevalue = this.cyfztx_date_n.BJData;
+
     // var convertData = function (
     //   datemap: { [x: string]: any },
     //   datevalue: string | any[]
@@ -323,8 +331,8 @@ export default class Container extends Vue {
     //   return res;
     // };
 
-    var series: any = [];
-    [["沈阳", datemap, datevalue]].forEach(function (item, i) {
+    var series = [];
+    [["北京", datemap, datevalue]].forEach(function (item, i) {
       series.push(
         {
           //城市坐标点动画
@@ -350,7 +358,7 @@ export default class Container extends Vue {
             },
           },
           symbol: "circle",
-          symbolSize: function (val: number[]) {
+          symbolSize: function (val) {
             return 8 + val[2] / 1000; //圆环大小
           },
           itemStyle: {
@@ -362,7 +370,7 @@ export default class Container extends Vue {
               color: "#FF6A6A",
             },
           },
-          data: item[2].map(function (dataItem: any) {
+          data: item[2].map(function (dataItem) {
             return {
               // name: dataItem[0].name,
               value: datemap[dataItem[0].name].concat([dataItem[0].value]),
@@ -382,7 +390,7 @@ export default class Container extends Vue {
           label: {
             normal: {
               show: true,
-              color: "red",
+              color: "blue",
               position: "right",
               formatter: "{b}",
             },
@@ -429,7 +437,7 @@ export default class Container extends Vue {
         enterable: true,
         transitionDuration: 0,
         extraCssText: "z-index:100",
-        formatter: function (params: { name: any; value: any[] }) {
+        formatter: function (params) {
           console.log(params);
           console.log(12323);
 
@@ -549,7 +557,6 @@ export default class Container extends Vue {
       geo: {
         map: "china",
         show: true,
-
         label: {
           emphasis: {
             show: false,
@@ -561,8 +568,9 @@ export default class Container extends Vue {
           },
         },
         roam: false, //是否允许缩放
-        layoutCenter: ["49%", "50%"], //地图位置
-        layoutSize: "120%",
+        zoom:1,
+        layoutCenter: ["48%", "40%"], //地图位置
+        layoutSize: '90%',
         itemStyle: {
           normal: {
             borderColor: "rgba(147, 235, 248, 1)",
@@ -584,7 +592,7 @@ export default class Container extends Vue {
               ],
               borderWidth: 0.5,
 
-              globalCoord: false, // 缺省为 false
+              globalCoord: true, // 缺省为 false
             },
             shadowColor: "rgba(128, 217, 248, 1)",
             // shadowColor: 'rgba(255, 255, 255, 1)',
@@ -627,29 +635,21 @@ export default class Container extends Vue {
       },
       series: series,
     };
-    option && myChart.setOption(option);
-        //点击前解绑，防止点击事件触发多次
-    myChart.off('click');
-    myChart.on('click', echartsMapClick);
-    function echartsMapClick(params:any) {
-      console.log(params);
-      
-    // alert(12);
-    if (!params.data) {
-        return;
-    } else {
-        //如果当前是最后一级，那就直接return
-        // if (parentInfo[parentInfo.length - 1].code == params.data.cityCode) {
-        //     return;
-        // }
-        // let data = params.data;
-        // parentInfo.push({
-        //     cityName: data.name,
-        //     code: data.cityCode,
-        // });
-        // init(data.cityCode);
-    }
-    }
+    console.log(option);
+    option && myChart.setOption(option,true);
+    let that = this;
+    //点击前解绑，防止点击事件触发多次
+    myChart.on("click", function (params) {
+      // console.log(params);
+      this.isMap=false;
+            echarts.registerMap("china", beijing);
+
+      setTimeout(() => {
+              that.initMap("全功");
+
+      },500);
+
+    });
   }
 }
 </script>
