@@ -21,7 +21,9 @@
         <!-- 左上角 -->
         <font class="desc top-left">
           <font class="name">常规工时</font>
-          <font class="num">56 <i class="icon"><img src='@/assets/images/down.png'/></i></font>
+          <font class="num"
+            >56 <i class="icon"><img src="@/assets/images/down.png" /></i
+          ></font>
         </font>
         <!-- 右上角 -->
         <font class="desc top-right">
@@ -30,15 +32,13 @@
         </font>
         <!-- 左下角 -->
         <font class="desc b-left">
-            <font class="num">56 <i class="icon"></i></font>
+          <font class="num">56 <i class="icon"></i></font>
           <font class="name">合同内</font>
-        
         </font>
         <!-- 右下角 -->
-         <font class="desc b-right">
-         
+        <font class="desc b-right">
           <font class="num">56 <i class="icon"></i></font>
-           <font class="name">合同内</font>
+          <font class="name">合同内</font>
         </font>
         <div
           class="workload-content-echarts"
@@ -168,16 +168,18 @@ export default class Container extends Vue {
   // 工作效率角度
   angle = 0;
   mounted() {
-    var chartDom: any = this.$refs.workload;
-    this.workloadCharts = echarts.init(chartDom);
-    this.workEfficEcharts();
-    this.oliMonitoring();
-    this.rankingEcharts();
+    this.$nextTick(() => {
+      var chartDom: any = this.$refs.workload;
+      this.workloadCharts = echarts.init(chartDom);
+      this.workEfficEcharts();
+      this.oliMonitoring();
+      this.rankingEcharts();
 
-    setInterval(() => {
-      //用setInterval做动画感觉有问题
-      this.initWorkloadEcharts();
-    }, 50);
+      setInterval(() => {
+        //用setInterval做动画感觉有问题
+        this.initWorkloadEcharts();
+      }, 50);
+    });
   }
   //获取圆上面某点的坐标(x0,y0表示坐标，r半径，angle角度)
 
@@ -825,8 +827,8 @@ export default class Container extends Vue {
       },
       legend: {
         data: ["Line 2", "Line 3"],
-         left:'0%',
-        top:'5%',
+        left: "0%",
+        top: "5%",
         textStyle: {
           color: "#fff",
         },
@@ -1077,7 +1079,7 @@ export default class Container extends Vue {
       .num {
         display: block;
         color: #fff;
-        img{
+        img {
           height: 15px;
         }
       }
@@ -1088,7 +1090,7 @@ export default class Container extends Vue {
       left: 30px;
       // border: 1px solid red;
     }
-      .b-right {
+    .b-right {
       background-image: url("~@/assets/images/b-right.png");
       bottom: 0px;
       right: 30px;

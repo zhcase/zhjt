@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:15:10
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-19 17:07:50
+ * @LastEditTime: 2021-11-20 21:56:07
  * @FilePath: /zhjt/src/components/content/index.vue
 -->
 <template>
@@ -144,9 +144,15 @@
       <span>{{ currentTime[0] }} </span> <span>{{ currentTime[1] }}</span>
     </div>
 
-    <div ref="map" style="width: 800px; height: 800px; margin-top: 50px" v-if="isMap" id='map'></div>
+    <div
+      ref="map"
+      style="width: 800px; height: 800px; margin-top: 50px"
+      v-if="isMap"
+      id="map"
+    ></div>
     <span class="video-player">
       <img src="@/assets/images/video-d.png" />
+      <button @click="handleClick">22</button>
     </span>
     <div class="video-dialog">
       <!-- <VideoPlayer/> -->
@@ -181,7 +187,7 @@ const beijing = require("@/static/beijing.json");
 export default class Container extends Vue {
   // 坐标对应的值
   currentTime = [];
-  isMap=true;
+  isMap = true;
   // 地图坐标
   cyfztx_date_n = {
     geoCoordMap: {
@@ -268,11 +274,15 @@ export default class Container extends Vue {
     // return res;
   }
 
+  handleClick() {
+    this.$forceUpdate();
+  }
+
   // 初始化展示地图
   initMap(name) {
-    this.isMap=true;
+    this.isMap = true;
     // if (name) {
-      // echarts.registerMap("china", beijing);
+    // echarts.registerMap("china", beijing);
     // }
     // let result = await Account.getProvinces("北京");
     // console.log(result);
@@ -568,9 +578,9 @@ export default class Container extends Vue {
           },
         },
         roam: false, //是否允许缩放
-        zoom:1,
+        zoom: 1,
         layoutCenter: ["48%", "40%"], //地图位置
-        layoutSize: '90%',
+        layoutSize: "90%",
         itemStyle: {
           normal: {
             borderColor: "rgba(147, 235, 248, 1)",
@@ -636,19 +646,20 @@ export default class Container extends Vue {
       series: series,
     };
     console.log(option);
-    option && myChart.setOption(option,true);
+    option && myChart.setOption(option, true);
     let that = this;
     //点击前解绑，防止点击事件触发多次
     myChart.on("click", function (params) {
       // console.log(params);
-      this.isMap=false;
-            echarts.registerMap("china", beijing);
-
-      setTimeout(() => {
-              that.initMap("全功");
-
-      },500);
-
+      if (option.geo.isLeaf) {
+        return;
+      }
+      this.isMap = false;
+      echarts.registerMap("beijing", beijing);
+      console.log(option);
+      option.geo.map = "beijing";
+      option.geo.isLeaf = true;
+      option && myChart.setOption(option);
     });
   }
 }
