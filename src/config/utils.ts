@@ -1,3 +1,10 @@
+/*
+ * @Author: zeHua
+ * @Date: 2021-11-04 13:33:27
+ * @LastEditors: zeHua
+ * @LastEditTime: 2021-11-20 10:51:07
+ * @FilePath: /zhjt/src/config/utils.ts
+ */
 export class Utils {
 
  /**
@@ -5,7 +12,7 @@ export class Utils {
   * @param  name 设置localStrong参数名称 
   * @param  content 设置localStrong参数内容
   */
-  static setStore(name,content) {
+  static setStore(name: string,content: string) {
     if (!name) return;
     if (typeof content !== 'string') {
       // tslint:disable-next-line:no-parameter-reassignment
@@ -31,6 +38,7 @@ export class Utils {
     if (!name) return;
     return window.localStorage.removeItem(name);
   }
-
-
 }
+
+
+

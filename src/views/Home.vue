@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-29 09:37:49
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-02 15:06:40
+ * @LastEditTime: 2021-11-20 10:37:30
  * @FilePath: /zhjt/src/views/Home.vue
 -->
 <template>
@@ -24,6 +24,12 @@
     <div class="jt__right">
       <right-side></right-side>
     </div>
+
+
+      <!-- 弹出地图层 -->
+    <div class="dialog-map">
+      <map-dialog></map-dialog>
+    </div>
     <!-- </dv-border-box-1> -->
   </div>
 </template>
@@ -35,6 +41,7 @@ import LeftSide from "@/components/leftSide/index.vue"; //左侧内容
 import Content from "@/components/content/index.vue"; //左侧内容
 import Container from "@/components/container/index.vue";
 import RightSide from "@/components/rightSide/index.vue";
+import MapDialog from '@/components/mapDialog/index.vue'
 @Options({
   components: {
     HelloWorld,
@@ -42,6 +49,7 @@ import RightSide from "@/components/rightSide/index.vue";
     Content,
     Container,
     RightSide,
+    MapDialog
   },
 })
 export default class Home extends Vue {}
@@ -74,6 +82,15 @@ export default class Home extends Vue {}
   }
   &__container {
     /* width: 20%; */
+  }
+  .dialog-map{
+    position: absolute;
+    top:0;
+    left:0;
+    z-index: 99;
+    width: 100%;
+    height: 100%;
+    // background-color: red;;
   }
 }
 </style>
