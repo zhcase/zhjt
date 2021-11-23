@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:15:10
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-23 17:15:27
+ * @LastEditTime: 2021-11-23 20:51:19
  * @FilePath: /zhjt/src/components/content/index.vue
 -->
 <template>
@@ -143,6 +143,13 @@
     <div class="zhjt-map__time">
       <span>{{ currentTime[0] }} </span> <span>{{ currentTime[1] }}</span>
     </div>
+    <div class="more">
+      <ul>
+        <li></li>
+        <li></li>
+        <li>查看更多内容>></li>
+      </ul>
+    </div>
 
     <div
       ref="map"
@@ -250,7 +257,7 @@ export default class Container extends Vue {
     let result = await Account.getMonitorData("LIST_VEHICLE_LOCATION");
     let data = result.data;
     for (let i = 0; i < data.length; i++) {
-      this.arrmap[i] = {
+      this.cyfztx_date_n.carSelectPoint[i] = {
         value: [data[i].longitude, data[i].latitude],
         id: data[i].vehicleCard,
       };
@@ -258,18 +265,22 @@ export default class Container extends Vue {
         data[i].longitude,
         data[i].latitude,
       ];
-      this.cyfztx_date_n.carSelectPoint.push(data[i].vehicleCard);
+      // this.cyfztx_date_n.carSelectPoint.push(data[i].vehicleCard);
     }
 
     //工作量分布
     let workResult = await Account.getMonitorData("LIST_WORKLOAD_LOCATION");
     let workData = workResult.data;
     for (let i = 0; i < workData.length; i++) {
-      this.cyfztx_date_n.geoCoordMap[workData[i].id] = [
+      this.cyfztx_date_n.carSelectPoint[workData[i].id] = [
         workData[i].longitude,
         workData[i].latitude,
       ];
-      this.cyfztx_date_n.workSelectPoint.push(workData[i].id);
+      this.cyfztx_date_n.workSelectPoint[i] = {
+        value: [workData[i].longitude, workData[i].latitude],
+        id: workData[i].id,
+      };
+      // this.cyfztx_date_n.workSelectPoint.push(workData[i].id);
     }
 
     this.initMap();
@@ -507,84 +518,63 @@ export default class Container extends Vue {
     */
 
     // console.log( this.arrmap);
-    series[0]={
+    series[1] = {
       type: "scatter",
       coordinateSystem: "geo",
       zlevel: 2,
       large: true,
-
       rippleEffect: {
         period: 4,
         brushType: "stroke",
         scale: 4,
       },
-      label: {
-        normal: {
-          show: true,
-          color: "blue",
-          position: "right",
-          formatter: "{b}",
-        },
-        emphasis: {
-          show: true,
-          color: "red",
-        },
-      },
+
       symbol: "",
       symbolSize: 5,
       itemStyle: {
         normal: {
           show: true,
-          color: "red",
+          color: "#a316f1",
         },
         emphasis: {
           show: true,
-          color: "red",
+          color: "#a316f1",
         },
       },
-      data: this.arrmap,
-    }
-   series[1]= {
-            type: "scatter",
-            coordinateSystem: "geo",
-            zlevel: 2,
-            rippleEffect: {
-              period: 4,
-              brushType: "stroke",
-              scale: 4,
-            },
-            label: {
-              normal: {
-                show: true,
-                color: "blue",
-                position: "right",
-                formatter: "{b}",
-              },
-              emphasis: {
-                show: true,
-                color: "red",
-              },
-            },
-            symbol: "",
-            symbolSize: 5,
-            itemStyle: {
-              normal: {
-                show: true,
-                color: "#0598FE",
-              },
-              emphasis: {
-                show: true,
-                color: "red",
-              },
-            },
-            data:[]
-   }
+      data: this.cyfztx_date_n.carSelectPoint,
+    };
+    // console.log(this.cyfztx_date_n.carSelectPoint);
+    // console.log(this.cyfztx_date_n);
+    series[0] = {
+      type: "scatter",
+      coordinateSystem: "geo",
+      zlevel: 2,
+      rippleEffect: {
+        period: 4,
+        brushType: "stroke",
+        scale: 4,
+      },
+
+      symbol: "",
+      symbolSize: 5,
+      itemStyle: {
+        normal: {
+          show: true,
+          color: "#0598FE",
+        },
+        emphasis: {
+          show: true,
+          color: "#0598FE",
+        },
+      },
+      data: this.cyfztx_date_n.workSelectPoint,
+    };
     var svg =
       "path://M32.597,9.782 L30.475,11.904 C30.085,12.294 29.452,12.294 29.061,11.904 C28.671,11.513 28.671,10.880 29.061,10.489 L31.182,8.368 C31.573,7.978 32.206,7.978 32.597,8.368 C32.987,8.759 32.987,9.392 32.597,9.782 ZM30.000,30.500 C30.000,31.328 29.329,32.000 28.500,32.000 L5.500,32.000 C4.672,32.000 4.000,31.328 4.000,30.500 C4.000,29.672 4.672,29.000 5.500,29.000 L8.009,29.000 L8.009,18.244 C8.009,13.139 12.034,9.000 17.000,9.000 C21.966,9.000 25.992,13.139 25.992,18.244 L25.992,29.000 L28.500,29.000 C29.329,29.000 30.000,29.672 30.000,30.500 ZM17.867,14.444 L13.000,22.000 L17.000,22.000 L17.133,26.556 L21.000,20.000 L17.000,20.000 L17.867,14.444 ZM25.221,6.327 C25.033,6.846 24.459,7.113 23.940,6.924 C23.421,6.735 23.153,6.162 23.342,5.643 L24.368,2.823 C24.557,2.304 25.131,2.037 25.650,2.226 C26.169,2.415 26.436,2.989 26.248,3.508 L25.221,6.327 ZM17.000,5.000 C16.448,5.000 16.000,4.552 16.000,4.000 L16.000,1.000 C16.000,0.448 16.448,0.000 17.000,0.000 C17.552,0.000 18.000,0.448 18.000,1.000 L18.000,4.000 C18.000,4.552 17.552,5.000 17.000,5.000 ZM10.028,7.197 C9.509,7.386 8.935,7.118 8.746,6.599 L7.720,3.780 C7.532,3.261 7.799,2.687 8.318,2.498 C8.837,2.309 9.411,2.577 9.600,3.096 L10.626,5.915 C10.815,6.434 10.547,7.008 10.028,7.197 ZM3.354,12.268 L1.232,10.146 C0.842,9.756 0.842,9.123 1.232,8.732 C1.623,8.342 2.256,8.342 2.646,8.732 L4.768,10.854 C5.158,11.244 5.158,11.877 4.768,12.268 C4.377,12.658 3.744,12.658 3.354,12.268 Z";
 
     var option = {
       backgroundColor: "rgba(34, 52, 164, 0)",
-      dataZoom: { show: true, realtime: false }, //实时刷新 type: 'inside', start: 0, end: 10, xAxisIndex: [0] }
+      // dataZoom: { show: true, realtime: false }, //实时刷新 type: 'inside', start: 0, end: 10, xAxisIndex: [0] }
       large: true,
       largeThreshold: 500,
 
@@ -692,27 +682,27 @@ export default class Container extends Vue {
           return res;
         },
       },
-      visualMap: {
-        //图例值控制
-        show: false,
-        type: "piecewise",
-        pieces: [
-          {
-            max: 5,
-            color: "#e67817",
-          },
-          {
-            min: 5,
-            max: 10,
-            color: "red",
-          },
-          {
-            min: 10,
-            color: "#a316f1",
-          },
-        ],
-        calculable: false,
-      },
+      // visualMap: {
+      //图例值控制
+      // show: false,
+      // type: "piecewise",
+      // pieces: [
+      //   {
+      //     max: 5,
+      //     color: "#e67817",
+      //   },
+      //   {
+      //     min: 5,
+      //     max: 10,
+      //     color: "red",
+      //   },
+      //   {
+      //     min: 10,
+      //     color: "#a316f1",
+      //   },
+      // ],
+      // calculable: false,
+      // },
       geo: {
         map: "china",
         show: true,
@@ -799,9 +789,9 @@ export default class Container extends Vue {
     //点击前解绑，防止点击事件触发多次
     myChart.on("click", function (params) {
       console.log(params);
-      // if (option.geo.isLeaf) {
-      //   return;
-      // }
+      if (option.geo.isLeaf) {
+        return;
+      }
       axios.get(`/json/${params.name}.json`).then((res) => {
         echarts.registerMap(params.name, res);
         option.geo.map = params.name;
@@ -818,6 +808,25 @@ export default class Container extends Vue {
 <style lang="scss" scoped>
 .zhjt-map {
   position: relative;
+  .more {
+    ul {
+      li:last-child {
+        height: 37px;
+        width: 120px;
+        font-size: 14px;
+        font-family: Microsoft YaHei;
+        font-weight: bold;
+        color: #ffffff;
+        line-height: 37px;
+        display: inline-block;
+        background-image: url("~@/assets/images/bg-btn.png");
+        background-size: 30px 120px;
+      }
+      li {
+        float: left;
+      }
+    }
+  }
   &__title {
     margin: 20px 0;
     img {

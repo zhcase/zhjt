@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:18:52
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-23 14:30:14
+ * @LastEditTime: 2021-11-23 20:55:45
  * @FilePath: /zhjt/src/components/container/index.vue
 -->
 <template>
@@ -709,7 +709,7 @@ export default class Container extends Vue {
     },30000)
   }
   async oliMonitoring() {
-    let result =await Account.getMonitorData('LIST_MILEAGE');
+    let result =await Account.getMonitorData('LIST_OIL');
     let lastOli=[]; // 上周油量
     let currentOli=[];//这周油量
     for(let item  of result.data.lastWeek){
