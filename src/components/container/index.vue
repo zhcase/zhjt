@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:18:52
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-16 11:40:17
+ * @LastEditTime: 2021-11-23 14:30:14
  * @FilePath: /zhjt/src/components/container/index.vue
 -->
 <template>
@@ -16,17 +16,26 @@
       <div class="d-container">
         <div class="item">
           <span class="img"><img src="@/assets/images/you@2x.png" /></span>
-          <span class="num">100%</span>
+          <span class="num" v-if="attendanceConfig.personnel">
+            {{attendanceConfig.personnel}}
+            <!-- <vns
+              :start="0"
+              :end="100"
+              :times="10"
+              :speed="attendanceConfig.personnel"
+            /> -->
+            %</span
+          >
           <span class="text">人员出勤</span>
         </div>
         <div class="item">
           <span class="img"><img src="@/assets/images/liang@2x.png" /></span>
-          <span class="num">100%</span>
-          <span class="text">人员出勤</span>
+          <span class="num">{{ attendanceConfig.vehicle }}%</span>
+          <span class="text">车辆出勤</span>
         </div>
         <div class="item">
           <span class="img"><img src="@/assets/images/cha@2x.png" /></span>
-          <span class="num">70%</span>
+          <span class="num">{{ attendanceConfig.oilMachine }}%</span>
           <span class="text">油机使用率</span>
         </div>
       </div>
@@ -60,11 +69,18 @@
   </div>
 </template>
 <script lang="ts">
-import { Vue } from "vue-class-component";
+import { Vue, Options } from "vue-class-component";
 import { Chart } from "@antv/g2";
 import { Area, Column } from "@antv/g2plot";
 import * as echarts from "echarts";
+import { Account } from "@/api/index";
+import vns from "vue-number-scroll";
 
+@Options({
+  components: {
+    vns,
+  },
+})
 export default class Container extends Vue {
   datas = [
     {
@@ -680,11 +696,29 @@ export default class Container extends Vue {
       月均降雨量: 42.4,
     },
   ];
+  // 出勤量配置
+  attendanceConfig = {};
+
   mounted() {
     this.initCarCharts();
     this.oliMonitoring();
+    this.getAttendanceData();
+    // 定时获取今日出勤量
+    setInterval(()=>{
+      this.getAttendanceData();
+    },30000)
   }
-  oliMonitoring() {
+  async oliMonitoring() {
+    let result =await Account.getMonitorData('LIST_MILEAGE');
+    let lastOli=[]; // 上周油量
+    let currentOli=[];//这周油量
+    for(let item  of result.data.lastWeek){
+        lastOli.push(item.oil);
+    }
+    for(let item  of result.data.thisWeek){
+        currentOli.push(item.oil);
+    }
+    
     var chartDom: any = this.$refs.oliChart;
     var myChart = echarts.init(chartDom);
     var option;
@@ -707,7 +741,7 @@ export default class Container extends Vue {
         },
       },
       legend: {
-        data: ["Line 2", "Line 3"],
+        data: ["本周油量", "上周油量"],
         left: "0%",
         top: "5%",
         textStyle: {
@@ -742,9 +776,10 @@ export default class Container extends Vue {
       ],
       series: [
         {
-          name: "Line 2",
+          name: "本周油量",
           type: "line",
           stack: "Total",
+          color:'#7BFBFD',
           smooth: true,
           lineStyle: {
             width: 0,
@@ -770,12 +805,13 @@ export default class Container extends Vue {
           emphasis: {
             focus: "series",
           },
-          data: [40, 232, 101, 204, 90, 340, 150],
+          data: currentOli,
         },
         {
-          name: "Line 3",
+          name: "上周油量",
           type: "line",
           stack: "Total",
+          color:'#8A4AF7',
           smooth: true,
           lineStyle: {
             width: 0,
@@ -798,7 +834,7 @@ export default class Container extends Vue {
           emphasis: {
             focus: "series",
           },
-          data: [320, 132, 201, 334, 190, 130, 220],
+          data: lastOli,
         },
       ],
     };
@@ -809,17 +845,18 @@ export default class Container extends Vue {
       data: this.carDatas,
       isGroup: true,
       xField: "月份",
+      
       height: 200,
       yField: "月均降雨量",
       seriesField: "name",
       /** 设置颜色 */
       color: ["#4195E3FF", "#FC41A8FF"],
       // textStyle: {},
-      // legend: {
-      //   textStyle: {
-      //     color: "#fff",
-      //   },
-      // },
+      legend: {
+        textStyle: {
+          color: "#fff",
+        },
+      },
       /** 设置间距 */
       // marginRatio: 0.1,
       //   label: {
@@ -838,6 +875,15 @@ export default class Container extends Vue {
     });
 
     stackedColumnPlot.render();
+  }
+  /**
+   * 获取出勤量
+   */
+  async getAttendanceData() {
+    let result = await Account.getMonitorData("RATE_TODAY_ATTENDANCE");
+    console.log(result);
+    this.attendanceConfig = result.data;
+    // console.log("helloworld");
   }
 }
 </script>

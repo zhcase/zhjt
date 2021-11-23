@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-29 09:37:49
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-20 21:55:26
+ * @LastEditTime: 2021-11-22 17:44:43
  * @FilePath: /zhjt/src/views/Home.vue
 -->
 <template>
@@ -26,14 +26,15 @@
     </div>
 
     <!-- 弹出地图层 -->
-    <!-- <div class="dialog-map">
-      <map-dialog></map-dialog>
-    </div> -->
+    <div class="dialog-map" v-if="isMap">
+      <map-dialog @handleBack='handleBack'></map-dialog>
+    </div>
     <!-- </dv-border-box-1> -->
   </div>
 </template>
 
-<script lang="ts">
+<script>
+
 import { Options, Vue } from "vue-class-component";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import LeftSide from "@/components/leftSide/index.vue"; //左侧内容
@@ -51,7 +52,14 @@ import MapDialog from "@/components/mapDialog/index.vue";
     MapDialog,
   },
 })
-export default class Home extends Vue {}
+export default class Home extends Vue {
+isMap=false;
+handleBack(){
+  // console.log(12323);
+  this.isMap=false;
+}
+
+}
 </script>
 
 <style lang="scss" scoped>

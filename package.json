@@ -18,6 +18,7 @@
     "vue-baidu-map": "^0.21.22",
     "vue-class-component": "^8.0.0-0",
     "vue-echarts": "^6.0.0",
+    "vue-number-scroll": "^2.0.1",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"
   },

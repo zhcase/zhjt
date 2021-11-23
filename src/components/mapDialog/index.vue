@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-11-19 17:14:34
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-20 18:08:23
+ * @LastEditTime: 2021-11-22 11:29:28
  * @FilePath: /zhjt/src/components/mapDialog/index.vue
 -->
 <template>
@@ -10,11 +10,73 @@
   <div class="satellite-map">
     <!-- 地图导航 -->
     <div class="map-nav">
-        <div ></div>
+      <div></div>
       <!-- logo -->
-      <dv-border-box-1 style="text-align:center;margin-top:20px;height:110px;padding:10px;width:490px">
-      <div class="logo" style="margin-top:10px">地图监控中心</div>
+      <dv-border-box-1
+        style="
+          text-align: center;
+          margin-top: 20px;
+          height: 110px;
+          padding: 10px;
+          width: 490px;
+        "
+      >
+        <div class="logo" style="margin-top: 10px">地图监控中心</div>
       </dv-border-box-1>
+      <div class="back" @click="handleBack" >&lt;&lt; 返回上个页面</div>
+
+      <div class="navigation">
+        <ul>
+          <li>
+            <div class="left">
+              <img src="@/assets/images/person.png" />
+            </div>
+            <div class="content">
+              <div class="name">保障人员</div>
+              <div class="num">在线数量 100</div>
+            </div>
+            <div class="right">
+              <span><img src="@/assets/images/lock.png" />未开启</span>
+            </div>
+          </li>
+           <li>
+            <div class="left">
+              <img src="@/assets/images/car.png" />
+            </div>
+            <div class="content">
+              <div class="name">保障人员</div>
+              <div class="num">在线数量 100</div>
+            </div>
+            <div class="right">
+              <span><img src="@/assets/images/lock.png" />未开启</span>
+            </div>
+          </li>
+            <li>
+            <div class="left">
+              <img src="@/assets/images/line-nav.png" />
+            </div>
+            <div class="content">
+              <div class="name">工作量</div>
+              <div class="num">上报数量  50000</div>
+            </div>
+            <div class="right">
+              <span><img src="@/assets/images/lock.png" />未开启</span>
+            </div>
+          </li>
+           <li>
+            <div class="left">
+              <img src="@/assets/images/gas.png" />
+            </div>
+            <div class="content">
+              <div class="name">保障人员</div>
+              <div class="num">在线数量 100</div>
+            </div>
+            <div class="right">
+              <span><img src="@/assets/images/lock.png" />未开启</span>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
     <!-- 卫星地图 -->
     <div
@@ -31,6 +93,11 @@ import { BMPGL } from "@/config/bmpgl.js";
 
 export default class Container extends Vue {
   ak = "jsug1ccNL9hyeZInNcfAN8f4qG65SyYx"; //ak秘钥
+
+
+  handleBack(){
+    this.$emit('handleBack')
+  }
   mounted() {
     BMPGL(this.ak).then((BMapGL) => {
       /** 
@@ -236,30 +303,107 @@ map.addOverlay(marker);
   position: absolute;
   left: 0;
   top: 0;
-  border: 1px solid red;
   .map-nav {
     position: absolute;
     width: 500px;
     z-index: 999;
+    font-size: 20px;
+
     height: 100%;
     left: 0;
     top: 0;
-    border: 1px solid red;
     .logo {
       font-size: 42px;
-      
+
       margin: 0 auto;
       width: 470px;
       font-family: YouSheBiaoTiHei;
-      margin-top:10px;
+      margin-top: 10px;
       font-weight: 400;
-      padding-right:-5px;
+      padding-right: -5px;
       line-height: 100px;
       height: 100px;
       background-repeat: no-repeat;
-      background-image: url("~@/assets/images/time-bg.png") ;
+      background-image: url("~@/assets/images/time-bg.png");
       background-size: 470px 100px;
       color: #ffffff;
+    }
+    .back {
+      width: 188px;
+      margin-left: 20px;
+      margin-top: 20px;
+      height: 51px;
+      line-height: 50px;
+      cursor: pointer;
+      text-align: center;
+      font-family: Microsoft YaHei;
+      font-weight: bold;
+      color: #ffffff;
+      background: rgba(0, 201, 255, 0.5);
+      // opacity: 0.5;
+    }
+    .navigation {
+      margin-top: 40px;
+      ul {
+        li {
+          width: 600px;
+          height: 137px;
+          background: linear-gradient(
+            90deg,
+            #17a4f1 0%,
+            rgba(23, 164, 241, 0) 100%
+          );
+          margin-top: 20px;
+          .left {
+            float: left;
+            padding: 25px 0;
+            width: 100px;
+            margin-left: 20px;
+            img {
+              height: 70px;
+            }
+          }
+          .content {
+            padding: 20px 0;
+            text-align: left;
+            margin-left: 50px;
+            width:200px;
+            float: left;
+            .name {
+              font-family: Microsoft YaHei;
+              font-weight: bold;
+              color: #03f6ff;
+              font-size: 32px;
+            }
+            .num {
+              font-size: 22px;
+              margin-top: 10px;
+              font-family: Microsoft YaHei;
+              font-weight: 400;
+              color: #ffffff;
+            }
+          }
+          .right {
+            float: left;
+            margin-top:15px;
+            margin-left: 25px;
+            span {
+              margin-top: 15px;
+              width: 114px;
+              line-height: 35px;
+              display: inline-block;
+              height: 35px;
+              color:#fff;
+              background: #03f6ff;
+              img {
+                height: 15px;
+                margin-right: 5px;
+            }
+            }
+            
+          }
+        }
+      }
     }
   }
 }
