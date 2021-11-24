@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-11-19 17:14:34
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-24 18:02:20
+ * @LastEditTime: 2021-11-24 20:59:39
  * @FilePath: /zhjt/src/components/mapDialog/index.vue
 -->
 <template>
@@ -92,6 +92,10 @@ import * as echarts from "echarts";
 import { BMPGL } from "@/config/bmpgl.js";
 import { Account } from "@/api";
 var goodsData = require("../../assets/json/geo.json"); //导入设置好的主题颜色 如果不需要，可以不做此操作
+const iconImg = require("@/assets/images/1637749040208.jpg");
+const workIcon = require("@/assets/images/WechatIMG125.png");
+const oliIcon = require("@/assets/images/1637752856305.jpg");
+const peopleIcon = require("@/assets/images/WechatIMG126.png");
 
 export default class Container extends Vue {
   ak = "jsug1ccNL9hyeZInNcfAN8f4qG65SyYx"; //ak秘钥
@@ -167,35 +171,169 @@ map.addOverlay(marker);
       var marker1 = new BMapGL.Marker(new BMapGL.Point(116.404, 39.925));
       var marker1 = new BMapGL.Marker(new BMapGL.Point(116.404, 39.925));
       // 创建图标
-      var myIcon = new BMapGL.Icon(
-        "https://img1.baidu.com/it/u=3338577561,1155466847&fm=26&fmt=auto",
-        new BMapGL.Size(52, 26)
-      );
+      var myIcon = new BMapGL.Icon(iconImg, new BMapGL.Size(10, 10)); // 车辆图标
+      let workIcons = new BMapGL.Icon(workIcon, new BMapGL.Size(10, 10)); //工作量图标
+      let oliIcons = new BMapGL.Icon(oliIcon, new BMapGL.Size(10, 10)); // 油机图标
+      let peopleIcons = new BMapGL.Icon(peopleIcon, new BMapGL.Size(10, 10)); // 电子工牌图标
+        var marker;
       //获取车辆位置
       let result = await Account.getMonitorData("LIST_VEHICLE_LOCATION");
       let carList = result.data;
-      let splitNum = carList.length / 300;
+      let splitNum = carList.length / 300; //每次请求300个
       let num = 1; //计数器
-      let  number=0;
+      let number = 0;
       for (let i = 0; i < Math.ceil(splitNum); i++) {
-       
-        num+=1;
+        num += 1;
         if (num > Math.ceil(splitNum)) {
           break;
         }
         setTimeout(() => {
           for (let item of result.data.splice(number, number + 300)) {
-            let mark = new BMapGL.Marker(
+             marker = new BMapGL.Marker(
               new BMapGL.Point(item.longitude, item.latitude),
               {
                 icon: myIcon,
+                id:item.vehicleCard
               }
             );
-            map.addOverlay(mark);
-          }
-           number += 300;
+            map.addOverlay(marker);
+            marker.addEventListener("click", async(e) => {
+          alert(1)
+          console.log(e);
+          let result =await Account.getMonitorData('GET_VEHICLE_LOCATION',0,0,e.currentTarget._config.id)
+          let data=result.data;
+          // this.filterMarker(e.target.point, index);
+          let content = `<div>
+           <div
+             style="
+              width: 242px;
+            height: 35px;
+            text-indent:1rem;
+            background: rgba(25, 193, 206, 1);
+            font-size: 16px;
+            font-family: Microsoft YaHei;
+            font-weight: bold;
+            color: #ffffff;
+            line-height: 35px;
+            margin-bottom: 2px;
+          "
+        >
+          距离派单一小时三十分钟
+        </div>
+        <div
+          style="
+            width: 326px;
+            height: 180px;
+            padding: 20px;
+            border: 2px solid #07DBEB;
+            background: rgba(39, 137, 143, 0.7);
+          "
+        >
+          <div style="height: 80px; width: 100%; display: flex">
+            <div style="height: 60px; width: 60px; margin-top: 10px">
+              <img
+                src="https://img1.baidu.com/it/u=1765464561,3100748160&fm=26&fmt=auto"
+                style="height: 60px; border-radius: 5px"
+              />
+            </div>
+            <div
+              style="
+                font-size: 16px;
+                font-family: Microsoft YaHei;
+                font-weight: bold;
+                color: #fffb07;
+              "
+            >
+              <ul style="margin-top: 10px">
+                <li>&nbsp; ${data.staffname} 直线距离：1km</li>
+                <li>NO.33654845413</li>
+                <li style="font-weight: 400; margin-left: 20px">
+                 &nbsp; 西安大区河北项目X据点
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div style="margin-top:20px">
+            <ul>
+              <li style="float: left; color: #fff">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  工单编号: </span
+                >356544212
+              </li>
+              <li style="float: left; margin-left: 20px;color: #fff">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  告警专业: </span
+                >356544212
+              </li>
+              <li style="float: left;margin-top:10px;color: #fff">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  地址信息: </span
+                >356544212
+              </li>
+
+              <li style="float: left; margin-left: 20px;margin-top:10px;color: #fff">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  供应商信息: </span
+                >356544212
+              </li>
+                  <li style="float: left;margin-top:10px;color: #fff">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  告警原因: </span
+                >356544212
+              </li>
+              <li style="float: left;margin-top:10px;color: #fff;margin-left: 20px;cursor:pointer;color:rgba(255, 251, 7, 1)" onclick='handleShowInfo()'>点击查看详细信息 》 》</li>
+            </ul>
+          </div>
+        </div>
+      </div>`;
+          var infoWindow = new BMapGL.InfoWindow(content, opts);
+          map.openInfoWindow(infoWindow, new BMapGL.Point(e.currentTarget.latLng.lng, e.currentTarget.latLng.lat));
         });
+          }
+
+          number += 300;
+        }, 5);
       }
+
+      // 获取工作量
+      let workResult = await Account.getMonitorData("LIST_WORKLOAD_LOCATION");
+
+      for (let item of workResult.data.splice(number, number + 300)) {
+        setTimeout(() => {
+           marker = new BMapGL.Marker(
+            new BMapGL.Point(item.longitude, item.latitude),
+            {
+              icon: workIcons,
+            }
+          );
+          map.addOverlay(marker);
+        }, 5);
+      }
+
+      //  获取油机位置
+      let oliResult = await Account.getMonitorData("LIST_OIL_MACHINE_LOCATION");
+      for (let item of oliResult.data) {
+         marker = new BMapGL.Marker(
+          new BMapGL.Point(item.longitude, item.latitude),
+          {
+            icon: oliIcons,
+          }
+        );
+        map.addOverlay(marker);
+      }
+
+      // 获取工牌位置
+      let peopleResult = await Account.getMonitorData("GET_PERSONNEL_LOCATION");
+      for (let item of peopleResult.data) {
+         marker = new BMapGL.Marker(
+          new BMapGL.Point(item.longitude, item.latitude),
+          {
+            icon: peopleIcons,
+          }
+        );
+        map.addOverlay(marker);
+      }
+
       // for (let item of result.data) {
       //   let mark = new BMapGL.Marker(
       //     new BMapGL.Point(item.longitude, item.latitude),
@@ -219,103 +357,16 @@ map.addOverlay(marker);
       //   icon: icon,
       //   first: "hello world",
       // });
-      map.addOverlay(points);
+      // map.addOverlay(points);
       // let marker;
-      // var opts = {
-      //   width: 382,
-      //   height: 320,
-      //   title: "<span style='display:none'></span>",
-      // };
+      var opts = {
+        width: 382,
+        height: 320,
+        title: "<span style='display:none'></span>",
+      };
 
-      //   marker.addEventListener("click", (e) => {
-      //     console.log(e);
-      //     // this.filterMarker(e.target.point, index);
-      //     let content = `<div>
-      //   <div
-      //     style="
-      //       width: 242px;
-      //       height: 35px;
-      //       text-indent:1rem;
-      //       background: rgba(25, 193, 206, 1);
-      //       font-size: 16px;
-      //       font-family: Microsoft YaHei;
-      //       font-weight: bold;
-      //       color: #ffffff;
-      //       line-height: 35px;
-      //       margin-bottom: 2px;
-      //     "
-      //   >
-      //     距离派单一小时三十分钟
-      //   </div>
-      //   <div
-      //     style="
-      //       width: 326px;
-      //       height: 180px;
-      //       padding: 20px;
-      //       border: 2px solid #07DBEB;
-      //       background: rgba(39, 137, 143, 0.7);
-      //     "
-      //   >
-      //     <div style="height: 80px; width: 100%; display: flex">
-      //       <div style="height: 60px; width: 60px; margin-top: 10px">
-      //         <img
-      //           src="https://img1.baidu.com/it/u=1765464561,3100748160&fm=26&fmt=auto"
-      //           style="height: 60px; border-radius: 5px"
-      //         />
-      //       </div>
-      //       <div
-      //         style="
-      //           font-size: 16px;
-      //           font-family: Microsoft YaHei;
-      //           font-weight: bold;
-      //           color: #fffb07;
-      //         "
-      //       >
-      //         <ul style="margin-top: 10px">
-      //           <li>&nbsp; 李倩 直线距离：1km</li>
-      //           <li>NO.33654845413</li>
-      //           <li style="font-weight: 400; margin-left: 20px">
-      //            &nbsp; 西安大区河北项目X据点
-      //           </li>
-      //         </ul>
-      //       </div>
-      //     </div>
-      //     <div style="margin-top:20px">
-      //       <ul>
-      //         <li style="float: left; color: #fff">
-      //           <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-      //             工单编号: </span
-      //           >356544212
-      //         </li>
-      //         <li style="float: left; margin-left: 20px;color: #fff">
-      //           <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-      //             告警专业: </span
-      //           >356544212
-      //         </li>
-      //         <li style="float: left;margin-top:10px;color: #fff">
-      //           <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-      //             地址信息: </span
-      //           >356544212
-      //         </li>
 
-      //         <li style="float: left; margin-left: 20px;margin-top:10px;color: #fff">
-      //           <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-      //             供应商信息: </span
-      //           >356544212
-      //         </li>
-      //             <li style="float: left;margin-top:10px;color: #fff">
-      //           <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-      //             告警原因: </span
-      //           >356544212
-      //         </li>
-      //         <li style="float: left;margin-top:10px;color: #fff;margin-left: 20px;cursor:pointer;color:rgba(255, 251, 7, 1)" onclick='handleShowInfo()'>点击查看详细信息 》 》</li>
-      //       </ul>
-      //     </div>
-      //   </div>
-      // </div>`;
-      //     var infoWindow = new BMapGL.InfoWindow(content, opts);
-      //     map.openInfoWindow(infoWindow, new BMapGL.Point(123.46417, 41.6775));
-      //   });
+        
 
       //分割=====
       // map.addOverlay(pointCollection);  // 添加Overlay

@@ -25,7 +25,7 @@
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx"
-  ],
+, "src/config/bmpgl.js"  ],
   "exclude": ["node_modules"],
   "files": ["/src/index.d.ts"]
 }

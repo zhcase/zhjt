@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 15:07:04
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-16 11:22:21
+ * @LastEditTime: 2021-11-23 09:51:38
  * @FilePath: /zhjt/src/components/rightSide/index.vue
 -->
 <template>
@@ -21,24 +21,60 @@
         <!-- 左上角 -->
         <font class="desc top-left">
           <font class="name">常规工时</font>
-          <font class="num">56 <i class="icon"><img src='@/assets/images/down.png'/></i></font>
+          <font class="num"
+            >{{ workLoadData.newData.commonWorkscore }}
+            <i class="icon">
+              <img
+                src="@/assets/images/upward.png"
+                v-if="workLoadData.isTopLeft"
+              />
+              <img
+                src="@/assets/images/down.png"
+                v-if="!workLoadData.isTopLeft"
+              /> </i
+          ></font>
         </font>
         <!-- 右上角 -->
         <font class="desc top-right">
           <font class="name">合同内</font>
-          <font class="num">56 <i class="icon"></i></font>
+          <font class="num"
+            >{{ workLoadData.newData.htnType }}
+            <i class="icon">
+              <img
+                src="@/assets/images/upward.png"
+                v-if="workLoadData.isTopRight" />
+              <img
+                src="@/assets/images/down.png"
+                v-if="!workLoadData.isTopLeft" /></i
+          ></font>
         </font>
         <!-- 左下角 -->
         <font class="desc b-left">
-            <font class="num">56 <i class="icon"></i></font>
-          <font class="name">合同内</font>
-        
+          <font class="num"
+            >{{ workLoadData.newData.excessWorkscore }}
+            <i class="icon">
+              <img
+                src="@/assets/images/upward.png"
+                v-if="workLoadData.isBottomLeft" />
+              <img
+                src="@/assets/images/down.png"
+                v-if="!workLoadData.isTopLeft" /></i
+          ></font>
+          <font class="name">超额工时</font>
         </font>
         <!-- 右下角 -->
-         <font class="desc b-right">
-         
-          <font class="num">56 <i class="icon"></i></font>
-           <font class="name">合同内</font>
+        <font class="desc b-right">
+          <font class="num"
+            >{{ workLoadData.newData.htwType
+            }}<i class="icon" style="margin-left: 5px">
+              <img
+                src="@/assets/images/upward.png"
+                v-if="workLoadData.isBottomRight" />
+              <img
+                src="@/assets/images/down.png"
+                v-if="!workLoadData.isTopLeft" /></i
+          ></font>
+          <font class="name">合同外</font>
         </font>
         <div
           class="workload-content-echarts"
@@ -101,9 +137,19 @@
 <script lang="ts">
 import { Vue } from "vue-class-component";
 import * as echarts from "echarts";
+import { Account } from "@/api/index";
 
 export default class Container extends Vue {
   salvProMax = [];
+  efficiencyConfig:any={}; //效率配置表
+  workLoadData = {
+    newData: {},
+    isTopLeft: true,
+    isTopRight: true,
+    isBottomLeft: true,
+    isBottomRight: true,
+    comparedToYesterday: 0,
+  }; //工作量占比数据
   config = {
     number: [100],
     content: "{nt}%",
@@ -167,17 +213,24 @@ export default class Container extends Vue {
   workloadCharts: any = "";
   // 工作效率角度
   angle = 0;
+  // 工作评级
+   workRatingList= ["工作时长", "工作得分", "车辆行驶时长"];
+  //  工作评级数据
+  workRatingData:any=[];
   mounted() {
-    var chartDom: any = this.$refs.workload;
-    this.workloadCharts = echarts.init(chartDom);
-    this.workEfficEcharts();
-    this.oliMonitoring();
-    this.rankingEcharts();
+    this.getWorkloadData();
+    this.getWorkRating();
+    this.$nextTick(() => {
+      var chartDom: any = this.$refs.workload;
+      this.workloadCharts = echarts.init(chartDom);
+      // this.workEfficEcharts();
+      this.oliMonitoring();
 
-    setInterval(() => {
-      //用setInterval做动画感觉有问题
-      this.initWorkloadEcharts();
-    }, 50);
+      setInterval(() => {
+        //用setInterval做动画感觉有问题
+        this.initWorkloadEcharts();
+      }, 50);
+    });
   }
   //获取圆上面某点的坐标(x0,y0表示坐标，r半径，angle角度)
 
@@ -198,6 +251,48 @@ export default class Container extends Vue {
     return sss;
   }
 
+  // 获取工作效率与工作评级
+  async getWorkRating(){
+    let result =await Account.getMonitorData('COUNT_JOB_EFFICIENCY_AND_JOB_EVALUATION');
+    let data=result.data;
+    this.workRatingData=[data.workHour,data.workScore,data.vehcileDrivingTime];
+    this.efficiencyConfig=data;
+    this.rankingEcharts();
+    this.workEfficEcharts();
+  }
+
+  // 获取工作量占比数据
+  async getWorkloadData() {
+    let result = await Account.getMonitorData("RATE_WORKLOAD");
+    let data = result.data;
+    if ((this.workLoadData.newData as any).commonWorkscore) {
+      // 如果实时数据大于当前的数据 箭头向上 否向下
+      //左上
+      if (
+        data.commonWorkscore >
+        (this.workLoadData.newData as any).commonWorkscore
+      ) {
+        this.workLoadData.isTopLeft = true;
+      }
+      // 右上
+      if (data.htnType > (this.workLoadData.newData as any).htnType) {
+        this.workLoadData.isTopRight = true;
+      }
+      // 左下
+      if (
+        data.excessWorkscore >
+        (this.workLoadData.newData as any).excessWorkscore
+      ) {
+        this.workLoadData.isBottomLeft = true;
+      }
+      // 右下
+      if (data.htwType > (this.workLoadData.newData as any).htwType) {
+        this.workLoadData.isBottomRight = true;
+      }
+    }
+    this.workLoadData.newData = data;
+    this.initWorkloadEcharts();
+  }
   // draw() {
 
   //   //window.requestAnimationFrame(draw);
@@ -213,8 +308,8 @@ export default class Container extends Vue {
       };
     }
     let angle = this.angle; //角度，用来做简单的动画效果的
-    let value = 55.33;
 
+    let value = (this.workLoadData.newData as any).comparedToYesterday;
     let option = {
       backgroundColor: "#03275b",
       title: {
@@ -582,10 +677,10 @@ export default class Container extends Vue {
     var myChart = echarts.init(chartDom);
     var charts = {
       // 按顺序排列从大到小
-      cityList: ["工作时长", "工作得分", "车辆行驶时长"],
-      cityData: [10, 9, 8],
+      workRatingList: this.workRatingList,
+      cityData: this.workRatingData,
     };
-    var top10CityList = charts.cityList;
+    var top10CityList = charts.workRatingList;
     var top10CityData = charts.cityData;
     var color = [
       "rgba(248,195,248",
@@ -596,14 +691,14 @@ export default class Container extends Vue {
     ];
 
     let lineY = [];
-    for (var i = 0; i < charts.cityList.length; i++) {
+    for (var i = 0; i < charts.workRatingList.length; i++) {
       /*
   var x = i
   if (x > color.length - 1) {
     x = color.length - 1
   }*/
       var data = {
-        name: charts.cityList[i],
+        name: charts.workRatingList[i],
         color: color[i] + ")",
         value: charts.cityData[i],
         itemStyle: {
@@ -682,7 +777,7 @@ export default class Container extends Vue {
               fontFamily: "PingFangSC-Regular",
             },
             formatter: function (val: any) {
-              return `${val}/10`;
+              return `${val}`; //`${val}/10`;
             },
           },
           splitArea: {
@@ -800,14 +895,25 @@ export default class Container extends Vue {
     option && myChart.setOption(option);
   }
 
-  // 油量监控
-  oliMonitoring() {
+  // 里程监控
+async  oliMonitoring() {
     var chartDom: any = this.$refs.oliChart;
     var myChart = echarts.init(chartDom);
     var option;
-
+    let result =await Account.getMonitorData('LIST_MILEAGE');
+    console.log(result);
+    
+    let lastOli=[]; // 上周里程
+    let currentOli=[];//这周里程
+    for(let item  of result.data.lastWeek){
+        lastOli.push(item.mileage);
+    }
+    for(let item  of result.data.thisWeek){
+        currentOli.push(item.mileage);
+    }
+    
     option = {
-      color: ["#80FFA5", "#00DDFF", "#37A2FF", "#FF0087", "#FFBF00"],
+      color: ["#000", "#00DDFF", "#37A2FF", "#FF0087", "#000"],
       title: {
         // text: "Gradient Stacked Area Chart",
       },
@@ -824,9 +930,9 @@ export default class Container extends Vue {
         },
       },
       legend: {
-        data: ["Line 2", "Line 3"],
-         left:'0%',
-        top:'5%',
+        data: ["上周里程", "本周里程"],
+        left: "0%",
+        top: "5%",
         textStyle: {
           color: "#fff",
         },
@@ -858,8 +964,9 @@ export default class Container extends Vue {
       ],
       series: [
         {
-          name: "Line 2",
+          name: "本周里程",
           type: "line",
+          color:'#EC43AE',
           stack: "Total",
           smooth: true,
           lineStyle: {
@@ -886,12 +993,13 @@ export default class Container extends Vue {
           emphasis: {
             focus: "series",
           },
-          data: [40, 232, 101, 204, 90, 340, 150],
+          data: currentOli,
         },
         {
-          name: "Line 3",
+          name: "上周里程",
           type: "line",
           stack: "Total",
+          color:'#F4C73C',
           smooth: true,
           lineStyle: {
             width: 0,
@@ -914,7 +1022,7 @@ export default class Container extends Vue {
           emphasis: {
             focus: "series",
           },
-          data: [320, 132, 201, 334, 190, 130, 220],
+          data: lastOli,
         },
       ],
     };
@@ -925,7 +1033,6 @@ export default class Container extends Vue {
    */
   workEfficEcharts() {
     var chartDom: any = this.$refs.main;
-    console.log(chartDom);
     var myChart: any = echarts.init(chartDom);
     var option;
     option = {
@@ -939,42 +1046,43 @@ export default class Container extends Vue {
           color: "#fff",
         },
         data: [
-          "Direct",
-          "Marketing",
-
-          // "Search Engine"
+           "人员效率",
+          "车辆效率",
+         
         ],
       },
       series: [
         {
-          name: "Access From",
+          name: "车辆效率",
           type: "pie",
           selectedMode: "single",
+          color:['rgba(7, 219, 255, 1)','#005b96'],
           radius: [0, "30%"],
           label: {
             position: "inner",
             fontSize: 0,
           },
-
           data: [
-            { value: 1548, name: "Search Engine" },
-            { value: 679, name: "Marketing" },
+            { value: this.efficiencyConfig.vehicleEfficiency, name: "车辆效率" },
+            { value: 100-this.efficiencyConfig.vehicleEfficiency, name: "车辆效率百分比" },
           ],
         },
         {
-          name: "Access From",
+          name: "人员效率",
           type: "pie",
+           color:['#71D879','#005b96'],
           label: {
             position: "inner",
             fontSize: 0,
+            
           },
           radius: ["45%", "60%"],
           labelLine: {
             length: 30,
           },
           data: [
-            { value: 1048, name: "Baidu" },
-            { value: 335, name: "Direct" },
+            { value: this.efficiencyConfig.personnelEfficiency, name: "人员效率" },
+            { value: 100-this.efficiencyConfig.personnelEfficiency, name: "百分比" },
           ],
         },
       ],
@@ -1077,7 +1185,7 @@ export default class Container extends Vue {
       .num {
         display: block;
         color: #fff;
-        img{
+        img {
           height: 15px;
         }
       }
@@ -1088,7 +1196,7 @@ export default class Container extends Vue {
       left: 30px;
       // border: 1px solid red;
     }
-      .b-right {
+    .b-right {
       background-image: url("~@/assets/images/b-right.png");
       bottom: 0px;
       right: 30px;

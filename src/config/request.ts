@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-11-04 13:33:27
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-04 14:10:52
+ * @LastEditTime: 2021-11-22 11:12:55
  * @FilePath: /zhjt/src/config/request.ts
  */
 import axios from "axios";
@@ -17,7 +17,7 @@ axios.interceptors.request.use(
     if (token) {
       const mytoken = JSON.parse(token);
       document.cookie = "tktoken=" + mytoken.token;
-      config.headers.common.Authorization = "a " + mytoken.token; // 让每个请求携带token ['X-Token'] 为自定义key
+      // config.headers.common.Authorization = "a " + mytoken.token; // 让每个请求携带token ['X-Token'] 为自定义key
     }
     return config;
   },
