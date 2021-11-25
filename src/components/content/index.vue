@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:15:10
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-25 13:58:50
+ * @LastEditTime: 2021-11-25 20:42:51
  * @FilePath: /zhjt/src/components/content/index.vue
 -->
 <template>
@@ -145,9 +145,9 @@
     </div>
     <div class="more">
       <ul>
-        <li></li>
-        <li></li>
-        <li>查看更多内容>></li>
+        <li><img src="@/assets/images/car-icon.png" /> 车辆分布</li>
+        <li><img src="@/assets/images/work-icon.png" /> 工作量分布</li>
+        <li @click="handleMoreClick">查看更多内容>></li>
       </ul>
     </div>
 
@@ -547,6 +547,7 @@ export default class Container extends Vue {
     // console.log(this.cyfztx_date_n);
     series[0] = {
       type: "scatter",
+      
       coordinateSystem: "geo",
       zlevel: 2,
       rippleEffect: {
@@ -809,18 +810,37 @@ export default class Container extends Vue {
 .zhjt-map {
   position: relative;
   .more {
+    color:'#fff';
+    width: 350px;
+    margin: 20px auto;
+    li{
+      color: #fff;
+      margin-left: 15px;
+      font-size: 14px;
+      height: 40px;
+      line-height: 40px;
+      img{
+        float: left;
+        margin-top:15px;
+        height: 10px;
+        vertical-align: middle;
+        margin-right: 5px;
+      }
+    }
     ul {
       li:last-child {
         height: 37px;
+        margin-left: 20px;
         width: 120px;
         font-size: 14px;
+        cursor: pointer;
         font-family: Microsoft YaHei;
         font-weight: bold;
         color: #ffffff;
         line-height: 37px;
         display: inline-block;
         background-image: url("~@/assets/images/bg-btn.png");
-        background-size: 30px 120px;
+        background-size: 120px 37px;
       }
       li {
         float: left;

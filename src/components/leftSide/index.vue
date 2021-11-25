@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-29 11:27:01
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-22 18:04:29
+ * @LastEditTime: 2021-11-25 21:06:22
  * @FilePath: /zhjt/src/components/leftSide/index.vue
 -->
 <template>
@@ -51,46 +51,45 @@
       >
         <div
           class="obd-content"
-          v-if="obdCarConifg.obdDataList[0]"
         >
           <span class="box-title">OBD拔出告警</span>
           <div class="img"><img src="@/assets/images/warning.png" /></div>
           <div class="desc">
-            <div class="d-content">
+            <div class="d-content" v-if="obdCarConifg.obdDataList[0]">
               <div class="item">
                
-                <div :class="{ 'animate-up': animateUp }">
+                <div :class="{ 'animate-up': animateUp }" v-for="(item,index) in obdCarConifg.obdDataList" :key='index'>
                  
                ({{
-                    obdCarConifg.obdDataList[obdCarConifg.cureentNum]
-                      .vehicleCard
-                  }})
+                    item.vehicleCard
+                  }}
                    <span>OBD拔出</span>
                 </div>
-             <div :class="{ 'animate-up': animateUp }">
+              </div>
+             <!-- <div :class="{ 'animate-up': animateUp }">
                   ({{
                     obdCarConifg.obdDataList[1]
                       .vehicleCard
                   }}) <span>OBD拔出</span>
                 </div> 
-              </div>
+              </div> -->
 
               <div class="item">
-                <div :class="{ 'animate-up': animateUp }">
+                <div :class="{ 'animate-up': animateUp }" v-for="(item,index) in obdCarConifg.obdDataList" :key='index'>
                   {{
-                    obdCarConifg.obdDataList[obdCarConifg.cureentNum].staffName
+                   item.staffName
                   }}
                   <span>{{
-                    obdCarConifg.obdDataList[obdCarConifg.cureentNum].deptName
+                    item.deptName
                   }}</span>
                 </div>
-                <div :class="{ 'animate-up': animateUp }">
+                <div :class="{ 'animate-up': animateUp }" v-for="(item,index) in obdCarConifg.obdDataList" :key='index'>
                   {{
-                    obdCarConifg.obdDataList[obdCarConifg.cureentNum+1]
+                    item
                       .staffName 
                   }}
                   <span>{{
-                    obdCarConifg.obdDataList[obdCarConifg.cureentNum + 1]
+                   item
                       .deptName
                   }}</span>
                 </div>
@@ -246,9 +245,9 @@ export default class Home extends Vue {
     let result = await Account.getMonitorData("LIST_OBD_PULL_OUT_ALARM");
     console.log(result.data);
     this.obdCarConifg.obdDataList = result.data;
-    if(this.obdCarConifg.obdDataList.length===1){
-      this.obdCarConifg.obdDataList.push(this.obdCarConifg.obdDataList[0])
-    }
+    // if(this.obdCarConifg.obdDataList.length===1){
+    //   this.obdCarConifg.obdDataList.push(this.obdCarConifg.obdDataList[0])
+    // }
    
   }
 

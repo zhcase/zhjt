@@ -1,0 +1,25 @@
+<!--
+ * @Author: zeHua
+ * @Date: 2021-11-25 19:48:30
+ * @LastEditors: zeHua
+ * @LastEditTime: 2021-11-25 19:55:18
+ * @FilePath: /zhjt/src/components/loading/index.vue
+-->
+<template>
+<div class="loading">
+    <dv-loading>Loading...</dv-loading>
+</div>
+</template>
+
+<style lang='scss' scoped>
+.loading{
+    position: absolute;
+    left:0;
+    top:0;
+    z-index:100;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    
+}
+</style>
