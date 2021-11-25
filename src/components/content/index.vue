@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:15:10
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-23 20:51:19
+ * @LastEditTime: 2021-11-25 13:58:50
  * @FilePath: /zhjt/src/components/content/index.vue
 -->
 <template>
@@ -245,7 +245,7 @@ export default class Container extends Vue {
     this.getCarAddress();
     setInterval(() => {
       this.currentTime = this.getCurrentDate();
-    });
+    },1000);
   }
 
   // 获取车辆位置  重构数据给与到map 地图点

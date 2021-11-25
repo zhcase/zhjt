@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-11-04 13:33:12
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-24 20:40:51
+ * @LastEditTime: 2021-11-25 10:36:22
  * @FilePath: /zhjt/src/api/account.ts
  */
 import request from "../config/request";
@@ -55,15 +55,21 @@ export class Account {
    * @param event  事件 key值
    * @param pageNum  页数
    * @param pageSize  每页数量
+   * @param vehicleCard 车牌号
+   * @param tableSuffix 分表字段
+   * @param id 工作量id
    * @returns 
    */
-  public static getMonitorData(event: string,pageNum?:number,pageSize?:number,vehicleCard?:string) {
+  public static getMonitorData(event: string,pageNum?:number,pageSize?:number,vehicleCard?:string,tableSuffix?:string,id?:number) {
     let data={
       event:event,
       body:{
         pageNum:pageNum,
         pageSize:pageSize,
-        vehicleCard:vehicleCard
+        vehicleCard:vehicleCard,
+        tableSuffix:tableSuffix,
+        id:id
+
       }
     }
     /* tslint:disable  */
