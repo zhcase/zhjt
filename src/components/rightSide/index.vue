@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 15:07:04
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-23 09:51:38
+ * @LastEditTime: 2021-11-26 00:05:08
  * @FilePath: /zhjt/src/components/rightSide/index.vue
 -->
 <template>
@@ -141,7 +141,7 @@ import { Account } from "@/api/index";
 
 export default class Container extends Vue {
   salvProMax = [];
-  efficiencyConfig:any={}; //效率配置表
+  efficiencyConfig: any = {}; //效率配置表
   workLoadData = {
     newData: {},
     isTopLeft: true,
@@ -214,9 +214,9 @@ export default class Container extends Vue {
   // 工作效率角度
   angle = 0;
   // 工作评级
-   workRatingList= ["工作时长", "工作得分", "车辆行驶时长"];
+  workRatingList = ["工作时长", "工作得分", "车辆行驶时长"];
   //  工作评级数据
-  workRatingData:any=[];
+  workRatingData: any = [];
   mounted() {
     this.getWorkloadData();
     this.getWorkRating();
@@ -252,11 +252,17 @@ export default class Container extends Vue {
   }
 
   // 获取工作效率与工作评级
-  async getWorkRating(){
-    let result =await Account.getMonitorData('COUNT_JOB_EFFICIENCY_AND_JOB_EVALUATION');
-    let data=result.data;
-    this.workRatingData=[data.workHour,data.workScore,data.vehcileDrivingTime];
-    this.efficiencyConfig=data;
+  async getWorkRating() {
+    let result = await Account.getMonitorData(
+      "COUNT_JOB_EFFICIENCY_AND_JOB_EVALUATION"
+    );
+    let data = result.data;
+    this.workRatingData = [
+      data.workHour,
+      data.workScore,
+      data.vehcileDrivingTime,
+    ];
+    this.efficiencyConfig = data;
     this.rankingEcharts();
     this.workEfficEcharts();
   }
@@ -896,22 +902,22 @@ export default class Container extends Vue {
   }
 
   // 里程监控
-async  oliMonitoring() {
+  async oliMonitoring() {
     var chartDom: any = this.$refs.oliChart;
     var myChart = echarts.init(chartDom);
     var option;
-    let result =await Account.getMonitorData('LIST_MILEAGE');
+    let result = await Account.getMonitorData("LIST_MILEAGE");
     console.log(result);
-    
-    let lastOli=[]; // 上周里程
-    let currentOli=[];//这周里程
-    for(let item  of result.data.lastWeek){
-        lastOli.push(item.mileage);
+
+    let lastOli = []; // 上周里程
+    let currentOli = []; //这周里程
+    for (let item of result.data.lastWeek) {
+      lastOli.push(item.mileage);
     }
-    for(let item  of result.data.thisWeek){
-        currentOli.push(item.mileage);
+    for (let item of result.data.thisWeek) {
+      currentOli.push(item.mileage);
     }
-    
+
     option = {
       color: ["#000", "#00DDFF", "#37A2FF", "#FF0087", "#000"],
       title: {
@@ -966,8 +972,8 @@ async  oliMonitoring() {
         {
           name: "本周里程",
           type: "line",
-          color:'#EC43AE',
-          stack: "Total",
+          color: "#EC43AE",
+          // stack: "本周里程",
           smooth: true,
           lineStyle: {
             width: 0,
@@ -982,11 +988,11 @@ async  oliMonitoring() {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
               {
                 offset: 0,
-                color: "rgba(255, 191, 0)",
+                color: "rgba(255, 0, 135)",
               },
               {
                 offset: 1,
-                color: "rgba(224, 62, 76)",
+                color: "rgba(135, 0, 157)",
               },
             ]),
           },
@@ -998,8 +1004,8 @@ async  oliMonitoring() {
         {
           name: "上周里程",
           type: "line",
-          stack: "Total",
-          color:'#F4C73C',
+          // stack: "本周里程",
+          color: "#F4C73C",
           smooth: true,
           lineStyle: {
             width: 0,
@@ -1011,11 +1017,11 @@ async  oliMonitoring() {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
               {
                 offset: 0,
-                color: "rgba(255, 0, 135)",
+                color: "rgba(255, 191, 0)",
               },
               {
                 offset: 1,
-                color: "rgba(135, 0, 157)",
+                color: "rgba(224, 62, 76)",
               },
             ]),
           },
@@ -1045,44 +1051,51 @@ async  oliMonitoring() {
         textStyle: {
           color: "#fff",
         },
-        data: [
-           "人员效率",
-          "车辆效率",
-         
-        ],
+        data: ["人员效率", "车辆效率"],
       },
       series: [
         {
           name: "车辆效率",
           type: "pie",
           selectedMode: "single",
-          color:['rgba(7, 219, 255, 1)','#005b96'],
+          color: ["rgba(7, 219, 255, 1)", "#005b96"],
           radius: [0, "30%"],
           label: {
             position: "inner",
             fontSize: 0,
           },
           data: [
-            { value: this.efficiencyConfig.vehicleEfficiency, name: "车辆效率" },
-            { value: 100-this.efficiencyConfig.vehicleEfficiency, name: "车辆效率百分比" },
+            {
+              value: this.efficiencyConfig.vehicleEfficiency,
+              name: "车辆效率",
+            },
+            {
+              value: 100 - this.efficiencyConfig.vehicleEfficiency,
+              name: "车辆效率百分比",
+            },
           ],
         },
         {
           name: "人员效率",
           type: "pie",
-           color:['#71D879','#005b96'],
+          color: ["#71D879", "#005b96"],
           label: {
             position: "inner",
             fontSize: 0,
-            
           },
           radius: ["45%", "60%"],
           labelLine: {
             length: 30,
           },
           data: [
-            { value: this.efficiencyConfig.personnelEfficiency, name: "人员效率" },
-            { value: 100-this.efficiencyConfig.personnelEfficiency, name: "百分比" },
+            {
+              value: this.efficiencyConfig.personnelEfficiency,
+              name: "人员效率",
+            },
+            {
+              value: 100 - this.efficiencyConfig.personnelEfficiency,
+              name: "百分比",
+            },
           ],
         },
       ],

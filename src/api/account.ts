@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-11-04 13:33:12
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-25 17:29:45
+ * @LastEditTime: 2021-11-25 23:21:10
  * @FilePath: /zhjt/src/api/account.ts
  */
 import request from "../config/request";
@@ -74,7 +74,7 @@ export class Account {
     }
     /* tslint:disable  */
     return request({
-      url: `http://192.168.0.24:8080/monitor`,
+      url: `https://bdvs.api.wintaotel.com.cn/monitor`,
       method: "post",
       data
     });

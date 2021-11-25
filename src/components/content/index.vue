@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:15:10
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-25 20:42:51
+ * @LastEditTime: 2021-11-25 23:26:22
  * @FilePath: /zhjt/src/components/content/index.vue
 -->
 <template>
@@ -245,7 +245,7 @@ export default class Container extends Vue {
     this.getCarAddress();
     setInterval(() => {
       this.currentTime = this.getCurrentDate();
-    },1000);
+    }, 1000);
   }
 
   // 获取车辆位置  重构数据给与到map 地图点
@@ -272,7 +272,7 @@ export default class Container extends Vue {
     let workResult = await Account.getMonitorData("LIST_WORKLOAD_LOCATION");
     let workData = workResult.data;
     for (let i = 0; i < workData.length; i++) {
-      this.cyfztx_date_n.carSelectPoint[workData[i].id] = [
+      this.cyfztx_date_n.workSelectPoint[workData[i].id] = [
         workData[i].longitude,
         workData[i].latitude,
       ];
@@ -547,7 +547,7 @@ export default class Container extends Vue {
     // console.log(this.cyfztx_date_n);
     series[0] = {
       type: "scatter",
-      
+
       coordinateSystem: "geo",
       zlevel: 2,
       rippleEffect: {
@@ -810,18 +810,18 @@ export default class Container extends Vue {
 .zhjt-map {
   position: relative;
   .more {
-    color:'#fff';
+    color: "#fff";
     width: 350px;
     margin: 20px auto;
-    li{
+    li {
       color: #fff;
       margin-left: 15px;
       font-size: 14px;
       height: 40px;
       line-height: 40px;
-      img{
+      img {
         float: left;
-        margin-top:15px;
+        margin-top: 15px;
         height: 10px;
         vertical-align: middle;
         margin-right: 5px;

@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:18:52
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-23 20:55:45
+ * @LastEditTime: 2021-11-26 00:04:46
  * @FilePath: /zhjt/src/components/container/index.vue
 -->
 <template>
@@ -17,7 +17,7 @@
         <div class="item">
           <span class="img"><img src="@/assets/images/you@2x.png" /></span>
           <span class="num" v-if="attendanceConfig.personnel">
-            {{attendanceConfig.personnel}}
+            {{ attendanceConfig.personnel }}
             <!-- <vns
               :start="0"
               :end="100"
@@ -704,21 +704,21 @@ export default class Container extends Vue {
     this.oliMonitoring();
     this.getAttendanceData();
     // 定时获取今日出勤量
-    setInterval(()=>{
+    setInterval(() => {
       this.getAttendanceData();
-    },30000)
+    }, 30000);
   }
   async oliMonitoring() {
-    let result =await Account.getMonitorData('LIST_OIL');
-    let lastOli=[]; // 上周油量
-    let currentOli=[];//这周油量
-    for(let item  of result.data.lastWeek){
-        lastOli.push(item.oil);
+    let result = await Account.getMonitorData("LIST_OIL");
+    let lastOli = []; // 上周油量
+    let currentOli = []; //这周油量
+    for (let item of result.data.lastWeek) {
+      lastOli.push(item.oil);
     }
-    for(let item  of result.data.thisWeek){
-        currentOli.push(item.oil);
+    for (let item of result.data.thisWeek) {
+      currentOli.push(item.oil);
     }
-    
+
     var chartDom: any = this.$refs.oliChart;
     var myChart = echarts.init(chartDom);
     var option;
@@ -778,8 +778,8 @@ export default class Container extends Vue {
         {
           name: "本周油量",
           type: "line",
-          stack: "Total",
-          color:'#7BFBFD',
+          stack: "Total1",
+          color: "#7BFBFD",
           smooth: true,
           lineStyle: {
             width: 0,
@@ -810,8 +810,8 @@ export default class Container extends Vue {
         {
           name: "上周油量",
           type: "line",
-          stack: "Total",
-          color:'#8A4AF7',
+          stack: "Total2",
+          color: "#8A4AF7",
           smooth: true,
           lineStyle: {
             width: 0,
@@ -845,7 +845,7 @@ export default class Container extends Vue {
       data: this.carDatas,
       isGroup: true,
       xField: "月份",
-      
+
       height: 200,
       yField: "月均降雨量",
       seriesField: "name",
@@ -873,6 +873,12 @@ export default class Container extends Vue {
       //     ],
       //   },
     });
+    console.log(stackedColumnPlot.chart);
+
+    stackedColumnPlot.chart.themeObject.components.legend.common.itemName.style.fill =
+      "#fff";
+    stackedColumnPlot.chart.themeObject.components.axis.common.grid.line.style.stroke =
+      "#fff";
 
     stackedColumnPlot.render();
   }

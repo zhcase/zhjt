@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-29 11:27:01
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-25 21:06:22
+ * @LastEditTime: 2021-11-25 23:23:20
  * @FilePath: /zhjt/src/components/leftSide/index.vue
 -->
 <template>
@@ -49,24 +49,22 @@
         class="l-side__abnormal__content"
         backgroundColor="rgba(20,87,140, 0.29)"
       >
-        <div
-          class="obd-content"
-        >
+        <div class="obd-content">
           <span class="box-title">OBD拔出告警</span>
           <div class="img"><img src="@/assets/images/warning.png" /></div>
           <div class="desc">
             <div class="d-content" v-if="obdCarConifg.obdDataList[0]">
               <div class="item">
-               
-                <div :class="{ 'animate-up': animateUp }" v-for="(item,index) in obdCarConifg.obdDataList" :key='index'>
-                 
-               ({{
-                    item.vehicleCard
-                  }}
-                   <span>OBD拔出</span>
+                <div
+                  :class="{ 'animate-up': animateUp }"
+                  v-for="(item, index) in obdCarConifg.obdDataList"
+                  :key="index"
+                >
+                  ({{ item.vehicleCard }}
+                  <span>OBD拔出</span>
                 </div>
               </div>
-             <!-- <div :class="{ 'animate-up': animateUp }">
+              <!-- <div :class="{ 'animate-up': animateUp }">
                   ({{
                     obdCarConifg.obdDataList[1]
                       .vehicleCard
@@ -75,38 +73,37 @@
               </div> -->
 
               <div class="item">
-                <div :class="{ 'animate-up': animateUp }" v-for="(item,index) in obdCarConifg.obdDataList" :key='index'>
-                  {{
-                   item.staffName
-                  }}
-                  <span>{{
-                    item.deptName
-                  }}</span>
+                <div
+                  :class="{ 'animate-up': animateUp }"
+                  v-for="(item, index) in obdCarConifg.obdDataList"
+                  :key="index"
+                >
+                  {{ item.staffName }}
+                  <span>{{ item.deptName }}</span>
                 </div>
-                <div :class="{ 'animate-up': animateUp }" v-for="(item,index) in obdCarConifg.obdDataList" :key='index'>
-                  {{
-                    item
-                      .staffName 
-                  }}
-                  <span>{{
-                   item
-                      .deptName
-                  }}</span>
+                <div
+                  :class="{ 'animate-up': animateUp }"
+                  v-for="(item, index) in obdCarConifg.obdDataList"
+                  :key="index"
+                >
+                  {{ item.staffName }}
+                  <span>{{ item.deptName }}</span>
                 </div>
               </div>
-              <div class="item" v-if="obdCarConifg.obdDataList[obdCarConifg.cureentNum].tel">
+              <div
+                class="item"
+                v-if="obdCarConifg.obdDataList[obdCarConifg.cureentNum].tel"
+              >
                 <div :class="{ 'animate-up': animateUp }">
                   司机
-                  <span
-                    >{{
-                      obdCarConifg.obdDataList[obdCarConifg.cureentNum].tel
-                    }}</span
-                  >
+                  <span>{{
+                    obdCarConifg.obdDataList[obdCarConifg.cureentNum].tel
+                  }}</span>
                 </div>
                 <div :class="{ 'animate-up': animateUp }">
                   司机
                   <span>{{
-                    obdCarConifg.obdDataList[obdCarConifg.cureentNum+1].tel
+                    obdCarConifg.obdDataList[obdCarConifg.cureentNum + 1].tel
                   }}</span>
                 </div>
               </div>
@@ -245,10 +242,10 @@ export default class Home extends Vue {
     let result = await Account.getMonitorData("LIST_OBD_PULL_OUT_ALARM");
     console.log(result.data);
     this.obdCarConifg.obdDataList = result.data;
+    console.log(this.obdCarConifg.obdDataList);
     // if(this.obdCarConifg.obdDataList.length===1){
     //   this.obdCarConifg.obdDataList.push(this.obdCarConifg.obdDataList[0])
     // }
-   
   }
 
   // 动画
