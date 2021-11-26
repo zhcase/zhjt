@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-11-19 17:14:34
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 18:41:20
+ * @LastEditTime: 2021-11-26 20:37:09
  * @FilePath: /zhjt/src/components/mapDialog/index.vue
 -->
 <template>
@@ -111,6 +111,9 @@
       id="allmap"
       style="width: 100%; height: 100%"
     ></div>
+    <div class="user-info" style="position: absolute; top: 140px;z-index:9999;left:400px" v-if="isShowWorkDetail">
+      <userDetail :datas='workDetailInfo' />
+    </div>
   </div>
 </template>
 <script>
@@ -118,6 +121,7 @@ import { Options, Vue } from "vue-class-component";
 import * as echarts from "echarts";
 import { BMPGL } from "@/config/bmpgl.js";
 import { Account } from "@/api";
+import userDetail from "@/components/content/components/userDetail.vue";
 import switchs from "@/components/switch/index.vue";
 var goodsData = require("../../assets/json/geo.json"); //导入设置好的主题颜色 如果不需要，可以不做此操作
 const iconImg = require("@/assets/images/car-icon.png");
@@ -128,12 +132,15 @@ const peopleIcon = require("@/assets/images/people-icon.png");
 @Options({
   components: {
     switchs,
+    userDetail
   },
 })
 export default class Container extends Vue {
   ak = "jsug1ccNL9hyeZInNcfAN8f4qG65SyYx"; //ak秘钥
   timer = "";
   toggle = false;
+  isShowWorkDetail=false;// 是否显示工作量详情
+  workDetailInfo={};//存储工作量详情
   currentTime = [];
   peopleStatus = true; // 人员保障状态
   oliStatus = true; //油机状态
@@ -145,9 +152,17 @@ export default class Container extends Vue {
   peopleIds = []; // 工牌标识
   carIds = [];
 
+  created() {
+    window.handleShowInfo = this.handleShowInfos;
+  }
   // 返回上一级页面
-  handleBackClick(){
-      this.$emit('closeDialog')
+  handleBackClick() {
+    this.$emit("closeDialog");
+  }
+
+    // 显示详情弹出
+  handleShowInfos(){
+    this.isShowWorkDetail=true;
   }
   /**
    * 修改人员状态
@@ -200,16 +215,16 @@ export default class Container extends Vue {
 
   // 获取电子工牌位置
   async getPeopleAddress() {
-     var opts = {
-        width: 382,
-        height: 320,
-        title: "<span style='display:none'></span>",
-      };
+    var opts = {
+      width: 382,
+      height: 320,
+      title: "<span style='display:none'></span>",
+    };
     // 获取工牌位置
     let peopleIcons = new BMapGL.Icon(peopleIcon, new BMapGL.Size(10, 10)); // 电子工牌图标
     let peopleResult = await Account.getMonitorData("LIST_PERSONNEL_LOCATION");
     let marker;
- 
+
     for (let item of peopleResult.data) {
       marker = new BMapGL.Marker(
         new BMapGL.Point(item.longitude, item.latitude),
@@ -222,7 +237,7 @@ export default class Container extends Vue {
       marker.addEventListener("click", async (e) => {
         console.log(e);
         let result = await Account.getMonitorData(
-          "GET_WORKLOAD_LOCATION",
+          "GET_PERSONNEL_LOCATION",
           0,
           0,
           undefined,
@@ -230,26 +245,12 @@ export default class Container extends Vue {
           undefined,
           e.currentTarget._config.id
         );
+        console.log(result);
         let data = result.data;
         console.log(data);
         // this.filterMarker(e.target.point, index);
         let content = `<div>
-           <div
-             style="
-              width: 242px;
-            height: 35px;
-            text-indent:1rem;
-            background: rgba(25, 193, 206, 1);
-            font-size: 16px;
-            font-family: Microsoft YaHei;
-            font-weight: bold;
-            color: #ffffff;
-            line-height: 35px;
-            margin-bottom: 2px;
-          "
-        >
-          距离派单一小时三十分钟
-        </div>
+          
         <div
           style="
             width: 326px;
@@ -275,43 +276,38 @@ export default class Container extends Vue {
               "
             >
               <ul style="margin-top: 10px">
-                <li>&nbsp; ${1} 直线距离：1km</li>
-                <li>NO.33654845413</li>
-                <li style="font-weight: 400; margin-left: 20px">
-                 &nbsp; 西安大区河北项目X据点
+                <li>&nbsp;姓名： ${data.staffName}</li>
+                <li>&nbsp;  </li>
+                <li style="font-weight: 400;">
+                 &nbsp;电话： ${data.tel}
                 </li>
               </ul>
             </div>
           </div>
           <div style="margin-top:20px">
             <ul>
-              <li style="float: left; color: #fff">
+            <li style="float: left; color: #fff;width:100%">
                 <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-                  工单编号: </span
-                >356544212
+                  公司: </span
+                >${data.company}
               </li>
-              <li style="float: left; margin-left: 20px;color: #fff">
-                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-                  告警专业: </span
-                >356544212
+              <li style="float: left; color: #fff;width:50%"">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold;>
+                  高度: </span
+                >${data.altitude}
               </li>
-              <li style="float: left;margin-top:10px;color: #fff">
-                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-                  地址信息: </span
-                >356544212
+              <li style="float: left; margin-left: 20px;color: #fff;width:50%;margin-top:10px">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold;width:50%">
+                  方向度: </span
+                >${data.direction}
+              </li>
+              <li style="float: left;margin-top:10px;color: #fff;width:50%"">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold;width:50%">
+                  速度: </span
+                >${data.speed}
               </li>
 
-              <li style="float: left; margin-left: 20px;margin-top:10px;color: #fff">
-                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-                  供应商信息: </span
-                >356544212
-              </li>
-                  <li style="float: left;margin-top:10px;color: #fff">
-                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-                  告警原因: </span
-                >356544212
-              </li>
-              <li style="float: left;margin-top:10px;color: #fff;margin-left: 20px;cursor:pointer;color:rgba(255, 251, 7, 1)" onclick='handleShowInfo()'>点击查看详细信息 》 》</li>
+              
             </ul>
           </div>
         </div>
@@ -470,37 +466,38 @@ export default class Container extends Vue {
   async getWorkAddress() {
     let workIcons = new BMapGL.Icon(workIcon, new BMapGL.Size(10, 10)); //工作量图标
     let marker;
-     var opts = {
-        width: 382,
-        height: 320,
-        title: "<span style='display:none'></span>",
-      };
+    var opts = {
+      width: 382,
+      height: 320,
+      title: "<span style='display:none'></span>",
+    };
     let workResult = await Account.getMonitorData("LIST_WORKLOAD_LOCATION");
     for (let item of workResult.data) {
       // setTimeout(() => {
-        marker = new BMapGL.Marker(
-          new BMapGL.Point(item.longitude, item.latitude),
-          {
-            icon: workIcons,
-            tableSuffix: item.tableSuffix,
-            id: item.id,
-          }
+      marker = new BMapGL.Marker(
+        new BMapGL.Point(item.longitude, item.latitude),
+        {
+          icon: workIcons,
+          tableSuffix: item.tableSuffix,
+          id: item.id,
+        }
+      );
+      this.workIds.push(item.id);
+      marker.addEventListener("click", async (e) => {
+        let result = await Account.getMonitorData(
+          "GET_WORKLOAD_LOCATION",
+          0,
+          0,
+          undefined,
+          e.currentTarget._config.tableSuffix,
+          e.currentTarget._config.id
         );
-        this.workIds.push(item.id);
-        marker.addEventListener("click", async (e) => {
-          let result = await Account.getMonitorData(
-            "GET_WORKLOAD_LOCATION",
-            0,
-            0,
-            undefined,
-            e.currentTarget._config.tableSuffix,
-            e.currentTarget._config.id
-          );
-          console.log(result);
-          let data = result.data;
-          console.log(data);
-          // this.filterMarker(e.target.point, index);
-          let content = `<div>
+        console.log(result);
+        let data = result.data;
+        this.workDetailInfo=data;
+        console.log(data);
+        // this.filterMarker(e.target.point, index);
+        let content = `<div>
        
         <div
           style="
@@ -540,7 +537,7 @@ export default class Container extends Vue {
               <li style="float: left; color: #fff">
                 <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
                   车牌号: </span
-                >${data.vehicleCard}
+                >${data.vehicleCard ? data.vehicleCard : "无"}
               </li>
               <li style="float: left; margin-left: 20px;color: #fff">
                 <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
@@ -557,31 +554,30 @@ export default class Container extends Vue {
           </div>
         </div>
       </div>`;
-          var infoWindow = new BMapGL.InfoWindow(content, opts);
-          this.map.openInfoWindow(
-            infoWindow,
-            new BMapGL.Point(
-              e.currentTarget.latLng.lng,
-              e.currentTarget.latLng.lat
-            )
-          );
-        });
+        var infoWindow = new BMapGL.InfoWindow(content, opts);
+        this.map.openInfoWindow(
+          infoWindow,
+          new BMapGL.Point(
+            e.currentTarget.latLng.lng,
+            e.currentTarget.latLng.lat
+          )
+        );
+      });
 
-        this.map.addOverlay(marker);
+      this.map.addOverlay(marker);
       // }, 5);
     }
-
   }
   // 获取油机位置
   async oliAddress() {
     let marker;
     let oliIcons = new BMapGL.Icon(oliIcon, new BMapGL.Size(10, 10)); // 油机图标
-    let oliResult = await Account.getMonitorData("LIST_OIL_MACHINE_LOCATION"); 
+    let oliResult = await Account.getMonitorData("LIST_OIL_MACHINE_LOCATION");
     var opts = {
-        width: 382,
-        height: 320,
-        title: "<span style='display:none'></span>",
-      };
+      width: 382,
+      height: 320,
+      title: "<span style='display:none'></span>",
+    };
     for (let item of oliResult.data) {
       marker = new BMapGL.Marker(
         new BMapGL.Point(item.longitude, item.latitude),
@@ -600,34 +596,19 @@ export default class Container extends Vue {
           undefined,
           undefined,
           undefined,
-                  undefined,
-
+          undefined,
+          e.currentTarget._config.id
         );
         let data = result.data;
         console.log(data);
-        
+
         // this.filterMarker(e.target.point, index);
         let content = `<div>
-           <div
-             style="
-              width: 242px;
-            height: 35px;
-            text-indent:1rem;
-            background: rgba(25, 193, 206, 1);
-            font-size: 16px;
-            font-family: Microsoft YaHei;
-            font-weight: bold;
-            color: #ffffff;
-            line-height: 35px;
-            margin-bottom: 2px;
-          "
-        >
-          距离派单一小时三十分钟
-        </div>
+          
         <div
           style="
             width: 326px;
-            height: 180px;
+            height: 200px;
             padding: 20px;
             border: 2px solid #07DBEB;
             background: rgba(39, 137, 143, 0.7);
@@ -640,7 +621,7 @@ export default class Container extends Vue {
                 style="height: 60px; border-radius: 5px"
               />
             </div>
-            <div
+             <div
               style="
                 font-size: 16px;
                 font-family: Microsoft YaHei;
@@ -649,43 +630,40 @@ export default class Container extends Vue {
               "
             >
               <ul style="margin-top: 10px">
-                <li>&nbsp; ${1} 直线距离：1km</li>
-                <li>NO.33654845413</li>
-                <li style="font-weight: 400; margin-left: 20px">
-                 &nbsp; 西安大区河北项目X据点
-                </li>
+                <li>&nbsp;油机编号: ${data.oilCode} </li>
+                <li> &nbsp;状态: ${data.state}</li>
+              
               </ul>
             </div>
           </div>
-          <div style="margin-top:20px">
+          <div >
             <ul>
-              <li style="float: left; color: #fff">
+              
+                  <li style="float: left;margin-top:10px;color: #fff;width:50%">
                 <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-                  工单编号: </span
-                >356544212
+                  电流: </span
+                >${data.avgElectric}
               </li>
-              <li style="float: left; margin-left: 20px;color: #fff">
+                <li style="float: left;margin-top:10px;color: #fff;width:50%">
                 <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-                  告警专业: </span
-                >356544212
+                  电压: </span
+                >${data.voltage}
               </li>
-              <li style="float: left;margin-top:10px;color: #fff">
+                <li style="float: left;margin-top:10px;color: #fff;width:50%">
                 <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-                  地址信息: </span
-                >356544212
+                  发电量: </span
+                >${data.powerAmount}
               </li>
-
-              <li style="float: left; margin-left: 20px;margin-top:10px;color: #fff">
+               <li style="float: left; margin-top:10px;color: #fff;width:100%">
                 <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-                  供应商信息: </span
-                >356544212
+                  lac/CI值: </span
+                >${data.lac}
               </li>
-                  <li style="float: left;margin-top:10px;color: #fff">
+                <li style="float: left;margin-top:10px;color: #fff;text-align:left">
                 <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-                  告警原因: </span
-                >356544212
+                  发电时间: </span
+                >${data.electricTime}
               </li>
-              <li style="float: left;margin-top:10px;color: #fff;margin-left: 20px;cursor:pointer;color:rgba(255, 251, 7, 1)" onclick='handleShowInfo()'>点击查看详细信息 》 》</li>
             </ul>
           </div>
         </div>
@@ -701,8 +679,6 @@ export default class Container extends Vue {
       });
       this.map.addOverlay(marker);
     }
-    
-    
   }
   getCurrentDate() {
     let d = new Date();
@@ -796,12 +772,12 @@ map.addOverlay(marker);
       // this.getCarAddress();
 
       // 获取工作量
-      // this.getWorkAddress();
+      this.getWorkAddress();
 
       //  获取油机位置
-      this.oliAddress();
+      // this.oliAddress();
       // 获取工牌位置
-      this.getPeopleAddress();
+      // this.getPeopleAddress();
     });
   }
 }
@@ -886,7 +862,7 @@ map.addOverlay(marker);
       background-image: url("~@/assets/images/back-bg.png");
       width: 230px;
       font-size: 20px;
-      z-index:1000;
+      z-index: 1000;
       background-size: 230px 44px;
       font-family: Microsoft YaHei;
       font-weight: bold;

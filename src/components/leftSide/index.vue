@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-29 11:27:01
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 17:58:35
+ * @LastEditTime: 2021-11-26 18:49:24
  * @FilePath: /zhjt/src/components/leftSide/index.vue
 -->
 <template>
@@ -15,7 +15,7 @@
       <dv-border-box-12
         :reverse="true"
         class="l-side__abnormal__content l-side__abnormal__item"
-        backgroundColor="rgba(16,68,113, 0.2)"
+        backgroundColor="rgba(20,87,140, 0.29)"
       >
         <!-- 标题 -->
         <div class="l-side__title"><i></i> <span>出车异常</span></div>
@@ -29,7 +29,7 @@
         style="margin-top: 15px"
         :reverse="true"
         class="l-side__abnormal__content l-side__abnormal__item"
-        backgroundColor="rgba(16,68,113, 0.2)"
+        backgroundColor="rgba(20,87,140, 0.29)"
       >
         <!-- 标题 -->
         <div class="l-side__title"><i></i> <span>安全驾驶告警</span></div>
@@ -48,69 +48,37 @@
         style="margin-top: 15px"
         :reverse="true"
         class="l-side__abnormal__content l-side__abnormal__item"
-        backgroundColor="rgba(16,68,113, 0.2)"
+        backgroundColor="rgba(20,87,140, 0.29)"
       >
         <div class="obd-content">
           <span class="box-title">OBD拔出告警</span>
           <div class="obd-content-container">
             <div class="img"><img src="@/assets/images/warning.png" /></div>
             <div class="desc">
-              <vue-seamless-scroll></vue-seamless-scroll>
-              <div class="d-content" v-if="obdCarConifg.obdDataList[0]">
-                <div class="item">
-                  <div
-                    :class="{ 'animate-up': animateUp }"
-                    v-for="(item, index) in obdCarConifg.obdDataList"
-                    :key="index"
-                  >
-                    ({{ item.vehicleCard }}
-                    <span>OBD拔出</span>
-                  </div>
-                </div>
-                <!-- <div :class="{ 'animate-up': animateUp }">
-                  ({{
-                    obdCarConifg.obdDataList[1]
-                      .vehicleCard
-                  }}) <span>OBD拔出</span>
-                </div> 
-              </div> -->
-
-                <div class="item">
-                  <div
-                    :class="{ 'animate-up': animateUp }"
-                    v-for="(item, index) in obdCarConifg.obdDataList"
-                    :key="index"
-                  >
-                    {{ item.staffName }}
-                    <span>{{ item.deptName }}</span>
-                  </div>
-                  <div
-                    :class="{ 'animate-up': animateUp }"
-                    v-for="(item, index) in obdCarConifg.obdDataList"
-                    :key="index"
-                  >
-                    {{ item.staffName }}
-                    <span>{{ item.deptName }}</span>
-                  </div>
-                </div>
-                <div
-                  class="item"
-                  v-if="obdCarConifg.obdDataList[obdCarConifg.cureentNum].tel"
-                >
-                  <div :class="{ 'animate-up': animateUp }">
-                    司机
-                    <span>{{
-                      obdCarConifg.obdDataList[obdCarConifg.cureentNum].tel
-                    }}</span>
-                  </div>
-                  <div :class="{ 'animate-up': animateUp }">
-                    司机
-                    <span>{{
-                      obdCarConifg.obdDataList[obdCarConifg.cureentNum + 1].tel
-                    }}</span>
-                  </div>
-                </div>
-              </div>
+              <vue-seamless-scroll
+                :data="obdCarConifg.obdDataList"
+                :class-option="{
+                  singleHeight: 120
+                }"
+                class="obd-warpper"
+              >
+                <ul>
+                  <li class="obd-item" v-for="(item, index) in obdCarConifg.obdDataList" :key="index">
+                    <div class="obd-item-cell">
+                      <span class="k">({{item.vehicleCard || '--'}})</span>
+                      <span class="v">OBD拔出</span>
+                    </div>
+                    <div class="obd-item-cell" v-show="item.staffName && item.deptName">
+                      <span class="k">{{item.staffName}}</span>
+                      <span class="v">{{item.deptName}}</span>
+                    </div>
+                    <div class="obd-item-cell">
+                      <span class="k">司机</span>
+                      <span class="v">{{item.tel || '--'}}</span>
+                    </div>
+                  </li>
+                </ul>
+              </vue-seamless-scroll>
             </div>
           </div>
         </div>
@@ -314,17 +282,23 @@ export default class Home extends Vue {
         }
         .desc {
           flex: 1;
-          .d-content {
-            width: 100%;
-            margin-left: 15px;
-            background-color: rgba(94, 191, 255, 0.25);
-            padding: 5px;
-            border-radius: 11px;
-            .item {
+          padding: 20px 10px;
+          margin-left: 15px;
+          border-radius: 11px;
+          background-color: rgba(94, 191, 255, 0.25);
+          .obd-warpper {
+            height: 110px;
+            overflow: hidden;
+          }
+          .obd-item {
+            height: 120px;
+          }
+          .obd-item-cell {
+              margin-bottom: 10px;
               height: 30px;
-              overflow: hidden;
+              padding: 0 5px;
               line-height: 30px;
-              margin-top: 5px;
+              overflow: hidden;
               color: #fff;
               border-left: 2px solid rgba(26, 201, 255, 1);
               border-right: 2px solid rgba(26, 201, 255, 1);
@@ -334,13 +308,21 @@ export default class Home extends Vue {
                 rgba(0, 255, 255, 0) 51%,
                 rgba(0, 255, 255, 0.25) 100%
               );
-              span {
-                margin-right: 5px;
+              font-size: 10px;
+              display: flex;
+              .k {
+                flex: 1;
+                text-align: left;
+                white-space: nowrap;
+                word-break: keep-all;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+              .v {
+                margin-left: 5px;
                 font-weight: bold;
                 color: rgba(248, 244, 0, 1);
-                float: right;
               }
-            }
           }
         }
         .box-title {
