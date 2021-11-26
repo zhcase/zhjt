@@ -2,12 +2,12 @@
  * @Author: zeHua
  * @Date: 2021-11-25 19:48:30
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-25 19:55:18
+ * @LastEditTime: 2021-11-26 09:49:40
  * @FilePath: /zhjt/src/components/loading/index.vue
 -->
 <template>
 <div class="loading">
-    <dv-loading>Loading...</dv-loading>
+    <dv-loading>加载中...</dv-loading>
 </div>
 </template>
 

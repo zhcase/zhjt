@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 15:07:04
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 00:05:08
+ * @LastEditTime: 2021-11-26 13:36:56
  * @FilePath: /zhjt/src/components/rightSide/index.vue
 -->
 <template>
@@ -95,7 +95,7 @@
         <div
           id="oliChart"
           ref="oliChart"
-          style="width: 300px; height: 250px"
+          style="width: 100%; height: 250px"
         ></div>
       </div>
     </dv-border-box-12>
@@ -1044,7 +1044,14 @@ export default class Container extends Vue {
     option = {
       tooltip: {
         trigger: "item",
-        formatter: "{a} <br/>{b}: {c} ({d}%)",
+          formatter:(params: any)=>{
+                    console.log(params)
+                    if(params.name){
+                      return  params.name+':'+params.value;
+                    }else{
+
+                    }
+                },
       },
       legend: {
         bottom: "bottom",
@@ -1070,8 +1077,8 @@ export default class Container extends Vue {
               name: "车辆效率",
             },
             {
-              value: 100 - this.efficiencyConfig.vehicleEfficiency,
-              name: "车辆效率百分比",
+              value: 10 - this.efficiencyConfig.vehicleEfficiency,
+              name: "",
             },
           ],
         },
@@ -1093,8 +1100,8 @@ export default class Container extends Vue {
               name: "人员效率",
             },
             {
-              value: 100 - this.efficiencyConfig.personnelEfficiency,
-              name: "百分比",
+              value: 10 - this.efficiencyConfig.personnelEfficiency,
+              name: "",
             },
           ],
         },

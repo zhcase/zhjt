@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-29 09:37:49
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-25 20:20:19
+ * @LastEditTime: 2021-11-26 09:30:45
  * @FilePath: /zhjt/src/views/Home.vue
 -->
 <template>
@@ -58,7 +58,6 @@ import Loading from '@/components/loading/index'
 export default class Home extends Vue {
 isMap=false;
 closeDialog(){
-  // console.log(12323);
   this.isMap=false;
 }
 

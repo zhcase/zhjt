@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:15:10
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-25 23:26:22
+ * @LastEditTime: 2021-11-26 10:56:36
  * @FilePath: /zhjt/src/components/content/index.vue
 -->
 <template>
@@ -146,7 +146,7 @@
     <div class="more">
       <ul>
         <li><img src="@/assets/images/car-icon.png" /> 车辆分布</li>
-        <li><img src="@/assets/images/work-icon.png" /> 工作量分布</li>
+        <li><img src="@/assets/images/work-icon1.png" /> 工作量分布</li>
         <li @click="handleMoreClick">查看更多内容>></li>
       </ul>
     </div>
@@ -196,6 +196,7 @@ export default class Container extends Vue {
   arrmap = [];
 
   isMap = true;
+  info = ""; //获取弹出信息
   // 地图坐标
   cyfztx_date_n = {
     geoCoordMap: {}, //配置现在所需要的地图
@@ -248,6 +249,9 @@ export default class Container extends Vue {
     }, 1000);
   }
 
+  // handleMoreClick(){
+  //   this.isMap=
+  // }
   // 获取车辆位置  重构数据给与到map 地图点
 
   async getCarAddress() {
@@ -279,6 +283,8 @@ export default class Container extends Vue {
       this.cyfztx_date_n.workSelectPoint[i] = {
         value: [workData[i].longitude, workData[i].latitude],
         id: workData[i].id,
+        type: "work",
+        tableSuffix: workData[i].tableSuffix,
       };
       // this.cyfztx_date_n.workSelectPoint.push(workData[i].id);
     }
@@ -306,7 +312,12 @@ export default class Container extends Vue {
   handleClick() {
     this.$forceUpdate();
   }
+  async getCarInfo(id) {
+    let result = await Account.getMonitorData("GET_VEHICLE_LOCATION", 0, 0, id);
 
+    let data = result.data;
+    this.info = data;
+  }
   // 初始化展示地图
   initMap(name) {
     this.isMap = true;
@@ -547,7 +558,7 @@ export default class Container extends Vue {
     // console.log(this.cyfztx_date_n);
     series[0] = {
       type: "scatter",
-
+      dataType: "work",
       coordinateSystem: "geo",
       zlevel: 2,
       rippleEffect: {
@@ -590,97 +601,167 @@ export default class Container extends Vue {
         enterable: true,
         transitionDuration: 0,
         extraCssText: "z-index:100",
-        formatter: function (params) {
+        formatter: (params, ticket, callback) => {
           //根据业务自己拓展要显示的内容
           var res = "";
-          // var name = params.name;
-          // var value = params.value[2];
-          // if (name != "") {
-          res = `<div>
-      <div
-        style="
-          width: 242px;
-          height: 35px;
-          background: #5db407;
-          font-size: 16px;
-          font-family: Microsoft YaHei;
-          font-weight: bold;
-          color: #ffffff;
-          line-height: 35px;
-          margin-bottom: 2px;
-        "
-      >
-        距离派单一小时三十分钟
-      </div>
-      <div
-        style="
-          width: 326px;
-          height: 180px;
-          padding: 20px;
-          border: 2px solid #7eff00;
-          background-image: radial-gradient(rgba(126, 255, 0, 0), rgba(126, 255, 0, 0.3))
-        "
-      >
-        <div style="height: 80px; width: 100%; display: flex">
-          <div style="height: 60px; width: 60px; margin-top: 10px">
-            <img
-              src="https://img1.baidu.com/it/u=1765464561,3100748160&fm=26&fmt=auto"
-              style="height: 60px; border-radius: 5px"
-            />
+          console.log(params);
+          if (params.data.type == "work") {
+            Account.getMonitorData(
+              "GET_WORKLOAD_LOCATION",
+              0,
+              0,
+              undefined,
+              params.data.tableSuffix,
+              params.data.id
+            ).then((results) => {
+              let data = results.data;
+              console.log(data);
+              res = `
+              <div>
+       
+        <div
+          style="
+            width: 326px;
+            height: 180px;
+            padding: 20px;
+            border: 2px solid #07DBEB;
+            background: rgba(39, 137, 143, 0.7);
+          "
+        >
+          <div style="height: 80px; width: 100%; display: flex">
+            <div style="height: 60px; width: 60px; margin-top: 10px">
+              <img
+                src="https://img1.baidu.com/it/u=1765464561,3100748160&fm=26&fmt=auto"
+                style="height: 60px; border-radius: 5px"
+              />
+            </div>
+            <div
+              style="
+                font-size: 16px;
+                font-family: Microsoft YaHei;
+                font-weight: bold;
+                color: #fffb07;
+              "
+            >
+              <ul style="margin-top: 10px">
+                <li style='text-align:left'>&nbsp; ${data.userName} </li>
+                <li style='text-align:left'> &nbsp; ${data.createTime}</li>
+                <li style="font-weight: 400;text-align:left">
+                 &nbsp; ${data.orgName}
+                </li>
+              </ul>
+            </div>
           </div>
-          <div
-            style="
-              font-size: 16px;
-              font-family: Microsoft YaHei;
-              font-weight: bold;
-              color: #fffb07;
-            "
-          >
-            <ul style="margin-top: 10px">
-              <li>&nbsp; 李倩 直线距离：1km</li>
-              <li>NO.33654845413</li>
-              <li style="font-weight: 400; margin-left: 20px">
-               &nbsp; 西安大区河北项目X据点
+          <div style="margin-top:20px">
+            <ul>
+              <li style="float: left; color: #fff">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  车牌号: </span
+                >${data.vehicleCard?data.vehicleCard:'未使用车辆'}
+              </li>
+              <li style="float: left; margin-left: 20px;color: #fff">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  工作时长: </span
+                >${data.workScore}
+              </li>
+              <li style="float: left;margin-top:10px;color: #fff;width:100%;text-align:left">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  维护信息: </span
+                >${data.maintenance}
               </li>
             </ul>
           </div>
         </div>
-        <div style="margin-top:20px">
-          <ul>
-            <li style="float: left; color: #fff">
-              <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-                工单编号: </span
-              >356544212
-            </li>
-            <li style="float: left; margin-left: 20px;color: #fff">
-              <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-                告警专业: </span
-              >356544212
-            </li>
-            <li style="float: left;margin-top:10px;color: #fff">
-              <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-                地址信息: </span
-              >356544212
-            </li>
-
-            <li style="float: left; margin-left: 20px;margin-top:10px;color: #fff">
-              <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-                供应商信息: </span
-              >356544212
-            </li>
-                <li style="float: left;margin-top:10px;color: #fff">
-              <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
-                告警原因: </span
-              >356544212
-            </li>
-            <li style="float: left;margin-top:10px;color: #fff;margin-left: 20px;cursor:pointer;color:rgba(255, 251, 7, 1)" onclick='handleShowInfo()'>点击查看详细信息 》 》</li>
-          </ul>
-        </div>
       </div>
-    </div>`;
+              `;
+                          callback(ticket, res);
 
-          // }
-          return res;
+            });
+          } else {
+            this.getCarInfo(params.data.id);
+            Account.getMonitorData(
+              "GET_VEHICLE_LOCATION",
+              0,
+              0,
+              params.data.id
+            ).then((results) => {
+              let data = results.data;
+              res = `<div>
+     
+       
+        <div
+          style="
+            width: 326px;
+            height: 180px;
+            padding: 20px;
+            border: 2px solid #07DBEB;
+            background: rgba(39, 137, 143, 0.7);
+          "
+        >
+          <div style="height: 80px; width: 100%; display: flex">
+            <div style="height: 60px; width: 60px; margin-top: 10px">
+              <img
+                src="https://img1.baidu.com/it/u=1765464561,3100748160&fm=26&fmt=auto"
+                style="height: 60px; border-radius: 5px"
+              />
+            </div>
+            <div
+              style="
+                font-size: 16px;
+                font-family: Microsoft YaHei;
+                font-weight: bold;
+                color: #fffb07;
+              "
+            >
+              <ul style="margin-top: 10px">
+                <li style='text-align:left'>&nbsp; ${data.staffname} </li>
+                <li style='text-align:left'>&nbsp; ${data.vehicleCard}</li>
+                <li style="font-weight: 400; ">
+                 &nbsp; ${data.date}
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div style="margin-top:20px">
+            <ul>
+             
+              <li style="float: left; color: #fff;width:50%;text-align:left">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  出车状态: </span
+                >${data.state}
+              </li>
+              <li style="float: left; margin-left: 20px;color: #fff">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  发动机状态: </span
+                >${data.velStatus}
+              </li>
+               <li style="float: left;margin-top:10px;color: #fff">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  当前里程: </span
+                >${data.currentNum ? data.currentNum + "KM" : "无"}
+              </li>
+                <li style="float: left;margin-top:10px;color: #fff;
+                width:100%;text-align:left">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  OBD编号: </span
+                >${data.obdCode ? data.obdCode : "无"}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>`;
+
+              // }
+              callback(ticket, res);
+            });
+          }
+
+          // let data = result.data;
+          // this.info = data;
+          // var name = params.name;
+          // var value = params.value[2];
+          // if (name != "") {
+          return "查询中...";
         },
       },
       // visualMap: {
@@ -790,6 +871,9 @@ export default class Container extends Vue {
     //点击前解绑，防止点击事件触发多次
     myChart.on("click", function (params) {
       console.log(params);
+      if (params.data) {
+        return;
+      }
       if (option.geo.isLeaf) {
         return;
       }

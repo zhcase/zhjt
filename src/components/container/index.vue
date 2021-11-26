@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:18:52
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 00:04:46
+ * @LastEditTime: 2021-11-26 13:36:02
  * @FilePath: /zhjt/src/components/container/index.vue
 -->
 <template>
@@ -17,14 +17,7 @@
         <div class="item">
           <span class="img"><img src="@/assets/images/you@2x.png" /></span>
           <span class="num" v-if="attendanceConfig.personnel">
-            {{ attendanceConfig.personnel }}
-            <!-- <vns
-              :start="0"
-              :end="100"
-              :times="10"
-              :speed="attendanceConfig.personnel"
-            /> -->
-            %</span
+          {{ attendanceConfig.personnel }}%</span
           >
           <span class="text">人员出勤</span>
         </div>
@@ -51,7 +44,7 @@
         <div
           id="oliChart"
           ref="oliChart"
-          style="width: 340px; height: 250px"
+          style="width: 100%; height: 250px"
         ></div>
       </div>
     </dv-border-box-12>
@@ -840,11 +833,21 @@ export default class Container extends Vue {
     };
     option && myChart.setOption(option);
   }
-  initCarCharts() {
+  async initCarCharts() {
+    // let result =await Account.getMonitorData('LIST_LOW_FREQUENCY_VEHICLE');
+    // console.log(result);
+    // console.log('hello');
+    // for(let item of result.data){
+    //   console.log(item);
+      
+    // }
+    //  this.carDatas=result.data;
+     
+    
     let stackedColumnPlot: any = new Column("CarChart", {
       data: this.carDatas,
       isGroup: true,
-      xField: "月份",
+      xField: "orgName",
 
       height: 200,
       yField: "月均降雨量",

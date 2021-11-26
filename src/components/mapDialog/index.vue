@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-11-19 17:14:34
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-25 20:08:14
+ * @LastEditTime: 2021-11-26 10:39:57
  * @FilePath: /zhjt/src/components/mapDialog/index.vue
 -->
 <template>
@@ -489,8 +489,6 @@ export default class Container extends Vue {
         );
         this.workIds.push(item.id);
         marker.addEventListener("click", async (e) => {
-          alert(1);
-          console.log(e);
           let result = await Account.getMonitorData(
             "GET_WORKLOAD_LOCATION",
             0,

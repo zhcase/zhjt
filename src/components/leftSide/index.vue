@@ -2,17 +2,16 @@
  * @Author: zeHua
  * @Date: 2021-09-29 11:27:01
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-25 23:23:20
+ * @LastEditTime: 2021-11-26 14:43:38
  * @FilePath: /zhjt/src/components/leftSide/index.vue
 -->
 <template>
-  <div class="l-side">
+  <div class="l-side"  v-if="abnormalConfig.data.length > 0&&warningConfig.data.length > 0">
     <div class="l-side__abnormal">
       <!-- 出车异常 -->
       <dv-border-box-12
         :reverse="true"
-        v-if="abnormalConfig.data.length > 0"
-        class="l-side__abnormal__content"
+        class="l-side__abnormal__content l-side__abnormal__item"
         backgroundColor="rgba(20,87,140, 0.29)"
       >
         <!-- 标题 -->
@@ -25,9 +24,8 @@
       <!-- 安全驾驶告警 -->
       <dv-border-box-12
         style="margin-top: 15px"
-        v-if="warningConfig.data.length > 0"
         :reverse="true"
-        class="l-side__abnormal__content"
+        class="l-side__abnormal__content l-side__abnormal__item"
         backgroundColor="rgba(20,87,140, 0.29)"
       >
         <!-- 标题 -->
@@ -46,11 +44,12 @@
       <dv-border-box-12
         style="margin-top: 15px"
         :reverse="true"
-        class="l-side__abnormal__content"
+        class="l-side__abnormal__content l-side__abnormal__item"
         backgroundColor="rgba(20,87,140, 0.29)"
       >
         <div class="obd-content">
           <span class="box-title">OBD拔出告警</span>
+          <div class="obd-content-container">
           <div class="img"><img src="@/assets/images/warning.png" /></div>
           <div class="desc">
             <div class="d-content" v-if="obdCarConifg.obdDataList[0]">
@@ -109,6 +108,7 @@
               </div>
             </div>
           </div>
+          </div>
         </div>
       </dv-border-box-12>
       <!-- 告警内容 -->
@@ -118,6 +118,12 @@
 <script>
 import { Options, Vue } from "vue-class-component";
 import { Account } from "@/api/index.ts";
+import vueSeamlessScroll from 'vue-seamless-scroll'
+@Options({
+  components:{
+    vueSeamlessScroll
+  }
+})
 export default class Home extends Vue {
   // 出车异常接口数据配置
   catchCarApiConfig = {
@@ -242,7 +248,6 @@ export default class Home extends Vue {
     let result = await Account.getMonitorData("LIST_OBD_PULL_OUT_ALARM");
     console.log(result.data);
     this.obdCarConifg.obdDataList = result.data;
-    console.log(this.obdCarConifg.obdDataList);
     // if(this.obdCarConifg.obdDataList.length===1){
     //   this.obdCarConifg.obdDataList.push(this.obdCarConifg.obdDataList[0])
     // }
@@ -261,6 +266,8 @@ export default class Home extends Vue {
     }, 1000);
   }
 }
+
+
 </script>
 
 <style lang="scss" scoped>
@@ -270,20 +277,44 @@ export default class Home extends Vue {
 }
 .l-side {
   margin-left: 0;
+  height: 100%;
   &__abnormal {
     /* overflow: hidden; */
-    height: auto;
+    display: flex;
+    
+    height: 100%;
+    // height: auto;
+        flex-direction:column;
 
-    height: 276px;
+
+
+    &__item{
+              // flex: 0 0 auto;
+                      // flex-grow: 1 ;
+                        flex: 1;
+
+    }
 
     &__content {
       /* padding: 20px; */
       /* background-color: rgba(94, 191, 255, 0.3); */
       .obd-content {
-        display: flex;
-        padding: 50px 16px;
+        // display: flex;
+        padding: 0px 26px;
+        height: 100%;
         position: relative;
+        &-container{
+          position: relative;
+          width: 100%;
+           display: flex;
+            justify-content: center; /* 水平居中 */
+            align-items: center;     /* 垂直居中 */
+            // width: 1000px;
+            height: 100%;
+            // border: 1px solid red;
+        }
         .desc {
+          
           flex: 1;
           .d-content {
             width: 100%;
@@ -402,5 +433,7 @@ export default class Home extends Vue {
 /deep/ .border-box-content {
   padding: 20px;
   width: auto !important;
+  position: relative;
+  
 }
 </style>
