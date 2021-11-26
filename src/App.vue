@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-29 09:37:49
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 14:10:01
+ * @LastEditTime: 2021-11-26 15:26:13
  * @FilePath: /zhjt/src/App.vue
 -->
 <template>
@@ -50,6 +50,8 @@ export default class Home extends Vue {
 #dv-full-screen-container {
   background-image: url("~@/assets/images/background.jpg");
   background-repeat: no-repeat;
+  overflow: hidden;
+  height: 100%;
   background-size: 100% 100%; /*宽高都100%*/
 }
 </style>

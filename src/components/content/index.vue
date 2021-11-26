@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:15:10
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 10:56:36
+ * @LastEditTime: 2021-11-26 15:35:27
  * @FilePath: /zhjt/src/components/content/index.vue
 -->
 <template>
@@ -153,7 +153,7 @@
 
     <div
       ref="map"
-      style="width: 800px; height: 800px; margin-top: 50px"
+      style="width: 800px; height: 800px; margin-top: 170px"
       v-if="isMap"
       id="map"
     ></div>

@@ -2,14 +2,14 @@
  * @Author: zeHua
  * @Date: 2021-09-30 15:07:04
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 13:36:56
+ * @LastEditTime: 2021-11-26 15:51:45
  * @FilePath: /zhjt/src/components/rightSide/index.vue
 -->
 <template>
   <div class="silde-right">
     <dv-border-box-12
       :reverse="true"
-      class="l-side__abnormal__content"
+      class="l-side__abnormal__content silde-right__item"
       backgroundColor="rgba(20,87,140, 0.29)"
     >
       <!-- 工作量标题 -->
@@ -87,7 +87,7 @@
     <dv-border-box-12
       :reverse="true"
       style="margin-top: 20px"
-      class="l-side__abnormal__content"
+      class="l-side__abnormal__content silde-right__item"
       backgroundColor="rgba(20,87,140, 0.29)"
     >
       <span class="oil-title">里程数监控</span>
@@ -103,14 +103,14 @@
     <dv-border-box-12
       :reverse="true"
       style="margin-top: 20px"
-      class="l-side__abnormal__content"
+      class="l-side__abnormal__content silde-right__item"
       backgroundColor="rgba(20,87,140, 0.29)"
     >
       <div class="work">
         <!-- 工作效率 -->
         <div class="efficiency">
           <div class="title">工作效率</div>
-          <div id="main" ref="main" style="width: 180px; height: 180px"></div>
+          <div id="main" ref="main" style="width: 180px; height: 180px;margin-top:20px"></div>
         </div>
         <!-- 工作评定 -->
         <div class="evaluation">
@@ -119,7 +119,7 @@
             <div
               id="echartsPros"
               ref="echartsPros"
-              style="height: 200px; width: 130px; padding-left: 20px"
+              style="height: 200px; width: 130px; padding-left: 20px;margin-top:20px"
             ></div>
             <!-- <ul>
               <li>
@@ -1122,6 +1122,7 @@ export default class Container extends Vue {
 </script>
 
 <style lang="scss" scoped>
+
 .l-side__abnormal__content {
   height: 276px;
   position: relative;
@@ -1192,6 +1193,7 @@ export default class Container extends Vue {
   }
   .workload-content {
     position: relative;
+    margin-top:20px;
     .desc {
       display: inline-block;
       background-size: 100px 40px;
@@ -1255,6 +1257,14 @@ export default class Container extends Vue {
 }
 .silde-right {
   margin-right: 30px;
+    display: flex;
+    
+    height: 96%;
+    // height: auto;
+        flex-direction:column;
+    &__item{
+        flex: 1;
+    }
   /* margin-left: 20px; */
   .silde-right-line {
     position: absolute;

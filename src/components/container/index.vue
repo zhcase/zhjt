@@ -2,14 +2,14 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:18:52
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 13:36:02
+ * @LastEditTime: 2021-11-26 15:51:32
  * @FilePath: /zhjt/src/components/container/index.vue
 -->
 <template>
-  <div>
+  <div class="yd-echart-container">
     <dv-border-box-12
       :reverse="true"
-      class="l-side__abnormal__content"
+      class="l-side__abnormal__content yd-echart-container__item"
       backgroundColor="rgba(20,87,140, 0.29)"
     >
       <span class="box-title">今日出勤量</span>
@@ -36,26 +36,26 @@
     <dv-border-box-12
       :reverse="true"
       style="margin-top: 20px"
-      class="l-side__abnormal__content"
+      class="l-side__abnormal__content yd-echart-container__item"
       backgroundColor="rgba(20,87,140, 0.29)"
     >
       <span class="oil-title">油量监控</span>
-      <div class="oli-chart">
+      <div class="oli-chart" style="height:80%">
         <div
           id="oliChart"
           ref="oliChart"
-          style="width: 100%; height: 250px"
+          style="width: 100%; height: 100%"
         ></div>
       </div>
     </dv-border-box-12>
     <dv-border-box-12
       :reverse="true"
       style="margin-top: 20px"
-      class="l-side__abnormal__content"
+      class="l-side__abnormal__content yd-echart-container__item"
       backgroundColor="rgba(20,87,140, 0.29)"
     >
       <span class="oil-title"> <i></i> 近期日低频使用</span>
-      <div class="oli-chart">
+      <div class="oli-chart" style="margin-top:20px;height:100%">
         <div id="CarChart" style="margin-top: 0px"></div>
       </div>
     </dv-border-box-12>
@@ -849,7 +849,7 @@ export default class Container extends Vue {
       isGroup: true,
       xField: "orgName",
 
-      height: 200,
+      height: 230,
       yField: "月均降雨量",
       seriesField: "name",
       /** 设置颜色 */
@@ -898,14 +898,27 @@ export default class Container extends Vue {
 </script>
 
 <style lang="scss" scoped>
+.yd-echart-container{
+    display: flex;
+    
+    height: 96%;
+    // height: auto;
+        flex-direction:column;
+        &__item{
+          //  flex: 0 0 auto;
+                      // flex-grow: 1 ;
+                        flex: 1;
+        }
+}
 .d-container {
   display: flex;
   padding-top: 40px;
   width: 100%;
-  height: 100%;
+  // height: 100%;
 
   .item {
     flex: 1;
+    margin-top:30px;
     span {
       display: inline-block;
     }
@@ -931,7 +944,7 @@ export default class Container extends Vue {
   }
 }
 .l-side__abnormal__content {
-  height: 276px;
+  // height: 276px;
   position: relative;
   /* padding: 20px; */
 

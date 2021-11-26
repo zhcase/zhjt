@@ -2,11 +2,14 @@
  * @Author: zeHua
  * @Date: 2021-09-29 11:27:01
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 14:43:38
+ * @LastEditTime: 2021-11-26 15:51:51
  * @FilePath: /zhjt/src/components/leftSide/index.vue
 -->
 <template>
-  <div class="l-side"  v-if="abnormalConfig.data.length > 0&&warningConfig.data.length > 0">
+  <div
+    class="l-side"
+    v-if="abnormalConfig.data.length > 0 && warningConfig.data.length > 0"
+  >
     <div class="l-side__abnormal">
       <!-- 出车异常 -->
       <dv-border-box-12
@@ -50,20 +53,20 @@
         <div class="obd-content">
           <span class="box-title">OBD拔出告警</span>
           <div class="obd-content-container">
-          <div class="img"><img src="@/assets/images/warning.png" /></div>
-          <div class="desc">
-            <div class="d-content" v-if="obdCarConifg.obdDataList[0]">
-              <div class="item">
-                <div
-                  :class="{ 'animate-up': animateUp }"
-                  v-for="(item, index) in obdCarConifg.obdDataList"
-                  :key="index"
-                >
-                  ({{ item.vehicleCard }}
-                  <span>OBD拔出</span>
+            <div class="img"><img src="@/assets/images/warning.png" /></div>
+            <div class="desc">
+              <div class="d-content" v-if="obdCarConifg.obdDataList[0]">
+                <div class="item">
+                  <div
+                    :class="{ 'animate-up': animateUp }"
+                    v-for="(item, index) in obdCarConifg.obdDataList"
+                    :key="index"
+                  >
+                    ({{ item.vehicleCard }}
+                    <span>OBD拔出</span>
+                  </div>
                 </div>
-              </div>
-              <!-- <div :class="{ 'animate-up': animateUp }">
+                <!-- <div :class="{ 'animate-up': animateUp }">
                   ({{
                     obdCarConifg.obdDataList[1]
                       .vehicleCard
@@ -71,43 +74,43 @@
                 </div> 
               </div> -->
 
-              <div class="item">
-                <div
-                  :class="{ 'animate-up': animateUp }"
-                  v-for="(item, index) in obdCarConifg.obdDataList"
-                  :key="index"
-                >
-                  {{ item.staffName }}
-                  <span>{{ item.deptName }}</span>
+                <div class="item">
+                  <div
+                    :class="{ 'animate-up': animateUp }"
+                    v-for="(item, index) in obdCarConifg.obdDataList"
+                    :key="index"
+                  >
+                    {{ item.staffName }}
+                    <span>{{ item.deptName }}</span>
+                  </div>
+                  <div
+                    :class="{ 'animate-up': animateUp }"
+                    v-for="(item, index) in obdCarConifg.obdDataList"
+                    :key="index"
+                  >
+                    {{ item.staffName }}
+                    <span>{{ item.deptName }}</span>
+                  </div>
                 </div>
                 <div
-                  :class="{ 'animate-up': animateUp }"
-                  v-for="(item, index) in obdCarConifg.obdDataList"
-                  :key="index"
+                  class="item"
+                  v-if="obdCarConifg.obdDataList[obdCarConifg.cureentNum].tel"
                 >
-                  {{ item.staffName }}
-                  <span>{{ item.deptName }}</span>
-                </div>
-              </div>
-              <div
-                class="item"
-                v-if="obdCarConifg.obdDataList[obdCarConifg.cureentNum].tel"
-              >
-                <div :class="{ 'animate-up': animateUp }">
-                  司机
-                  <span>{{
-                    obdCarConifg.obdDataList[obdCarConifg.cureentNum].tel
-                  }}</span>
-                </div>
-                <div :class="{ 'animate-up': animateUp }">
-                  司机
-                  <span>{{
-                    obdCarConifg.obdDataList[obdCarConifg.cureentNum + 1].tel
-                  }}</span>
+                  <div :class="{ 'animate-up': animateUp }">
+                    司机
+                    <span>{{
+                      obdCarConifg.obdDataList[obdCarConifg.cureentNum].tel
+                    }}</span>
+                  </div>
+                  <div :class="{ 'animate-up': animateUp }">
+                    司机
+                    <span>{{
+                      obdCarConifg.obdDataList[obdCarConifg.cureentNum + 1].tel
+                    }}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
           </div>
         </div>
       </dv-border-box-12>
@@ -118,11 +121,11 @@
 <script>
 import { Options, Vue } from "vue-class-component";
 import { Account } from "@/api/index.ts";
-import vueSeamlessScroll from 'vue-seamless-scroll'
+import vueSeamlessScroll from "vue-seamless-scroll";
 @Options({
-  components:{
-    vueSeamlessScroll
-  }
+  components: {
+    vueSeamlessScroll,
+  },
 })
 export default class Home extends Vue {
   // 出车异常接口数据配置
@@ -266,8 +269,6 @@ export default class Home extends Vue {
     }, 1000);
   }
 }
-
-
 </script>
 
 <style lang="scss" scoped>
@@ -277,22 +278,19 @@ export default class Home extends Vue {
 }
 .l-side {
   margin-left: 0;
-  height: 100%;
+  height: 96%;
   &__abnormal {
     /* overflow: hidden; */
     display: flex;
-    
+
     height: 100%;
     // height: auto;
-        flex-direction:column;
+    flex-direction: column;
 
-
-
-    &__item{
-              // flex: 0 0 auto;
-                      // flex-grow: 1 ;
-                        flex: 1;
-
+    &__item {
+      flex: 0 0 auto;
+      flex-grow: 1;
+      flex: 1;
     }
 
     &__content {
@@ -303,18 +301,17 @@ export default class Home extends Vue {
         padding: 0px 26px;
         height: 100%;
         position: relative;
-        &-container{
+        &-container {
           position: relative;
           width: 100%;
-           display: flex;
-            justify-content: center; /* 水平居中 */
-            align-items: center;     /* 垂直居中 */
-            // width: 1000px;
-            height: 100%;
-            // border: 1px solid red;
+          display: flex;
+          justify-content: center; /* 水平居中 */
+          align-items: center; /* 垂直居中 */
+          // width: 1000px;
+          height: 100%;
+          // border: 1px solid red;
         }
         .desc {
-          
           flex: 1;
           .d-content {
             width: 100%;
@@ -434,6 +431,5 @@ export default class Home extends Vue {
   padding: 20px;
   width: auto !important;
   position: relative;
-  
 }
 </style>
