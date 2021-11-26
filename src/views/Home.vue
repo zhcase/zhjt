@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-29 09:37:49
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 15:53:14
+ * @LastEditTime: 2021-11-26 18:22:27
  * @FilePath: /zhjt/src/views/Home.vue
 -->
 <template>
@@ -14,7 +14,7 @@
     </div>
     <!-- 地图 内容 -->
     <div class="jt__content">
-      <Content />
+      <Content @handleViewMore='handleMoreClick' />
     </div>
     <!-- 图表内容 -->
     <div class="jt__container">
@@ -27,10 +27,10 @@
 
     <!-- 弹出地图层 -->
     <div class="dialog-map" v-if="isMap">
-      <map-dialog @closeDialog='closeDialog'></map-dialog>
+      <map-dialog @closeDialog='closeDialog' @closeLoading='closeLoading'></map-dialog>
     </div>
     <!-- </dv-border-box-1> -->
-    <!-- <Loading/> -->
+    <!-- <Loading v-if="isShowLoading" /> -->
   </div>
 </template>
 
@@ -57,8 +57,19 @@ import Loading from '@/components/loading/index'
 })
 export default class Home extends Vue {
 isMap=true;
+isShowLoading=false;
 closeDialog(){
   this.isMap=false;
+}
+// 查看更多
+handleMoreClick(){
+    this.isMap=true; //显示弹出
+    this.isShowLoading=true; //显示loading
+}
+// 关闭loading
+closeLoading(){
+    this.isShowLoading=false; //关闭Loading
+
 }
 
 }

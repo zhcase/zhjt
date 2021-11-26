@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-11-04 13:33:12
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-25 23:21:10
+ * @LastEditTime: 2021-11-26 18:44:39
  * @FilePath: /zhjt/src/api/account.ts
  */
 import request from "../config/request";
@@ -60,7 +60,7 @@ export class Account {
    * @param id 工作量id
    * @returns 
    */
-  public static getMonitorData(event: string,pageNum?:number,pageSize?:number,vehicleCard?:string,tableSuffix?:string,id?:number,deviceCode?:string) {
+  public static getMonitorData(event: string,pageNum?:number,pageSize?:number,vehicleCard?:string,tableSuffix?:string,id?:number,deviceCode?:string,oilCode?:string) {
     let data={
       event:event,
       body:{
@@ -69,7 +69,8 @@ export class Account {
         vehicleCard:vehicleCard,
         tableSuffix:tableSuffix,
         id:id,
-        deviceCode:deviceCode
+        deviceCode:deviceCode,
+        oilCode:oilCode
       }
     }
     /* tslint:disable  */

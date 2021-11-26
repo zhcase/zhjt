@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:18:52
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 15:51:32
+ * @LastEditTime: 2021-11-26 18:05:23
  * @FilePath: /zhjt/src/components/container/index.vue
 -->
 <template>
@@ -10,7 +10,7 @@
     <dv-border-box-12
       :reverse="true"
       class="l-side__abnormal__content yd-echart-container__item"
-      backgroundColor="rgba(20,87,140, 0.29)"
+        backgroundColor="rgba(16,68,113, 0.2)"
     >
       <span class="box-title">今日出勤量</span>
       <div class="d-container">
@@ -37,7 +37,8 @@
       :reverse="true"
       style="margin-top: 20px"
       class="l-side__abnormal__content yd-echart-container__item"
-      backgroundColor="rgba(20,87,140, 0.29)"
+        backgroundColor="rgba(16,68,113, 0.2)"
+
     >
       <span class="oil-title">油量监控</span>
       <div class="oli-chart" style="height:80%">
@@ -52,7 +53,8 @@
       :reverse="true"
       style="margin-top: 20px"
       class="l-side__abnormal__content yd-echart-container__item"
-      backgroundColor="rgba(20,87,140, 0.29)"
+        backgroundColor="rgba(16,68,113, 0.2)"
+
     >
       <span class="oil-title"> <i></i> 近期日低频使用</span>
       <div class="oli-chart" style="margin-top:20px;height:100%">
@@ -834,20 +836,45 @@ export default class Container extends Vue {
     option && myChart.setOption(option);
   }
   async initCarCharts() {
-    // let result =await Account.getMonitorData('LIST_LOW_FREQUENCY_VEHICLE');
-    // console.log(result);
-    // console.log('hello');
-    // for(let item of result.data){
-    //   console.log(item);
+    //  {
+    //   name: "London",
+    //   月份: "Jan.",
+    //   月均降雨量: 18.9,
+    // },
+    // {
+    //   name: "London",
+    //   月份: "Feb.",
+    //   月均降雨量: 28.8,
+    // },
+    this.carDatas=[];
+    let result =await Account.getMonitorData('LIST_LOW_FREQUENCY_VEHICLE');
+    console.log(result);
+    console.log('hello');
+    for(let item of result.data){
+      console.log(item);
+      this.carDatas.push(  
+         {
+      name: '英里',
+      月份: item.orgName,
+      月均降雨量: item.totalMile,
+    }
+    )
+        this.carDatas.push(  
+         {
+      name: '总时间',
+      月份: item.orgName,
+      月均降雨量: item.totalTime,
+    }
+    )
       
-    // }
+    }
     //  this.carDatas=result.data;
      
     
     let stackedColumnPlot: any = new Column("CarChart", {
       data: this.carDatas,
       isGroup: true,
-      xField: "orgName",
+      xField: "月份",
 
       height: 230,
       yField: "月均降雨量",

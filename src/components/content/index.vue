@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:15:10
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 15:35:27
+ * @LastEditTime: 2021-11-26 16:23:20
  * @FilePath: /zhjt/src/components/content/index.vue
 -->
 <template>
@@ -249,9 +249,12 @@ export default class Container extends Vue {
     }, 1000);
   }
 
-  // handleMoreClick(){
-  //   this.isMap=
-  // }
+/**
+ * 点击查看更多
+ */
+  handleMoreClick(){
+    this.$emit('handleViewMore')
+  }
   // 获取车辆位置  重构数据给与到map 地图点
 
   async getCarAddress() {

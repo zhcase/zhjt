@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-11-19 17:14:34
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 10:39:57
+ * @LastEditTime: 2021-11-26 18:41:20
  * @FilePath: /zhjt/src/components/mapDialog/index.vue
 -->
 <template>
@@ -209,8 +209,7 @@ export default class Container extends Vue {
     let peopleIcons = new BMapGL.Icon(peopleIcon, new BMapGL.Size(10, 10)); // 电子工牌图标
     let peopleResult = await Account.getMonitorData("LIST_PERSONNEL_LOCATION");
     let marker;
-    console.log("peopleResult");
-    console.log(peopleResult);
+ 
     for (let item of peopleResult.data) {
       marker = new BMapGL.Marker(
         new BMapGL.Point(item.longitude, item.latitude),
@@ -223,7 +222,7 @@ export default class Container extends Vue {
       marker.addEventListener("click", async (e) => {
         console.log(e);
         let result = await Account.getMonitorData(
-          "GET_PERSONNEL_LOCATION",
+          "GET_WORKLOAD_LOCATION",
           0,
           0,
           undefined,
@@ -478,7 +477,7 @@ export default class Container extends Vue {
       };
     let workResult = await Account.getMonitorData("LIST_WORKLOAD_LOCATION");
     for (let item of workResult.data) {
-      setTimeout(() => {
+      // setTimeout(() => {
         marker = new BMapGL.Marker(
           new BMapGL.Point(item.longitude, item.latitude),
           {
@@ -569,15 +568,20 @@ export default class Container extends Vue {
         });
 
         this.map.addOverlay(marker);
-      }, 5);
+      // }, 5);
     }
+
   }
   // 获取油机位置
   async oliAddress() {
     let marker;
     let oliIcons = new BMapGL.Icon(oliIcon, new BMapGL.Size(10, 10)); // 油机图标
-    let oliResult = await Account.getMonitorData("LIST_OIL_MACHINE_LOCATION");
-    console.log(oliResult);
+    let oliResult = await Account.getMonitorData("LIST_OIL_MACHINE_LOCATION"); 
+    var opts = {
+        width: 382,
+        height: 320,
+        title: "<span style='display:none'></span>",
+      };
     for (let item of oliResult.data) {
       marker = new BMapGL.Marker(
         new BMapGL.Point(item.longitude, item.latitude),
@@ -587,8 +591,118 @@ export default class Container extends Vue {
         }
       );
       this.oliIds.push(item.oilCode);
+      marker.addEventListener("click", async (e) => {
+        console.log(e);
+        let result = await Account.getMonitorData(
+          "GET_OIL_MACHINE_LOCATION",
+          0,
+          0,
+          undefined,
+          undefined,
+          undefined,
+                  undefined,
+
+        );
+        let data = result.data;
+        console.log(data);
+        
+        // this.filterMarker(e.target.point, index);
+        let content = `<div>
+           <div
+             style="
+              width: 242px;
+            height: 35px;
+            text-indent:1rem;
+            background: rgba(25, 193, 206, 1);
+            font-size: 16px;
+            font-family: Microsoft YaHei;
+            font-weight: bold;
+            color: #ffffff;
+            line-height: 35px;
+            margin-bottom: 2px;
+          "
+        >
+          距离派单一小时三十分钟
+        </div>
+        <div
+          style="
+            width: 326px;
+            height: 180px;
+            padding: 20px;
+            border: 2px solid #07DBEB;
+            background: rgba(39, 137, 143, 0.7);
+          "
+        >
+          <div style="height: 80px; width: 100%; display: flex">
+            <div style="height: 60px; width: 60px; margin-top: 10px">
+              <img
+                src="https://img1.baidu.com/it/u=1765464561,3100748160&fm=26&fmt=auto"
+                style="height: 60px; border-radius: 5px"
+              />
+            </div>
+            <div
+              style="
+                font-size: 16px;
+                font-family: Microsoft YaHei;
+                font-weight: bold;
+                color: #fffb07;
+              "
+            >
+              <ul style="margin-top: 10px">
+                <li>&nbsp; ${1} 直线距离：1km</li>
+                <li>NO.33654845413</li>
+                <li style="font-weight: 400; margin-left: 20px">
+                 &nbsp; 西安大区河北项目X据点
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div style="margin-top:20px">
+            <ul>
+              <li style="float: left; color: #fff">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  工单编号: </span
+                >356544212
+              </li>
+              <li style="float: left; margin-left: 20px;color: #fff">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  告警专业: </span
+                >356544212
+              </li>
+              <li style="float: left;margin-top:10px;color: #fff">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  地址信息: </span
+                >356544212
+              </li>
+
+              <li style="float: left; margin-left: 20px;margin-top:10px;color: #fff">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  供应商信息: </span
+                >356544212
+              </li>
+                  <li style="float: left;margin-top:10px;color: #fff">
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
+                  告警原因: </span
+                >356544212
+              </li>
+              <li style="float: left;margin-top:10px;color: #fff;margin-left: 20px;cursor:pointer;color:rgba(255, 251, 7, 1)" onclick='handleShowInfo()'>点击查看详细信息 》 》</li>
+            </ul>
+          </div>
+        </div>
+      </div>`;
+        var infoWindow = new BMapGL.InfoWindow(content, opts);
+        this.map.openInfoWindow(
+          infoWindow,
+          new BMapGL.Point(
+            e.currentTarget.latLng.lng,
+            e.currentTarget.latLng.lat
+          )
+        );
+      });
       this.map.addOverlay(marker);
     }
+    
+    
   }
   getCurrentDate() {
     let d = new Date();
@@ -679,16 +793,15 @@ map.addOverlay(marker);
       // 创建图标
       var marker;
       //获取车辆位置
-      this.getCarAddress();
+      // this.getCarAddress();
 
       // 获取工作量
-      this.getWorkAddress();
+      // this.getWorkAddress();
 
       //  获取油机位置
       this.oliAddress();
       // 获取工牌位置
       this.getPeopleAddress();
-     
     });
   }
 }

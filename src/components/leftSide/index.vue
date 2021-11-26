@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-29 11:27:01
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 15:51:51
+ * @LastEditTime: 2021-11-26 17:58:35
  * @FilePath: /zhjt/src/components/leftSide/index.vue
 -->
 <template>
@@ -15,7 +15,7 @@
       <dv-border-box-12
         :reverse="true"
         class="l-side__abnormal__content l-side__abnormal__item"
-        backgroundColor="rgba(20,87,140, 0.29)"
+        backgroundColor="rgba(16,68,113, 0.2)"
       >
         <!-- 标题 -->
         <div class="l-side__title"><i></i> <span>出车异常</span></div>
@@ -29,7 +29,7 @@
         style="margin-top: 15px"
         :reverse="true"
         class="l-side__abnormal__content l-side__abnormal__item"
-        backgroundColor="rgba(20,87,140, 0.29)"
+        backgroundColor="rgba(16,68,113, 0.2)"
       >
         <!-- 标题 -->
         <div class="l-side__title"><i></i> <span>安全驾驶告警</span></div>
@@ -48,13 +48,14 @@
         style="margin-top: 15px"
         :reverse="true"
         class="l-side__abnormal__content l-side__abnormal__item"
-        backgroundColor="rgba(20,87,140, 0.29)"
+        backgroundColor="rgba(16,68,113, 0.2)"
       >
         <div class="obd-content">
           <span class="box-title">OBD拔出告警</span>
           <div class="obd-content-container">
             <div class="img"><img src="@/assets/images/warning.png" /></div>
             <div class="desc">
+              <vue-seamless-scroll></vue-seamless-scroll>
               <div class="d-content" v-if="obdCarConifg.obdDataList[0]">
                 <div class="item">
                   <div
@@ -121,7 +122,7 @@
 <script>
 import { Options, Vue } from "vue-class-component";
 import { Account } from "@/api/index.ts";
-import vueSeamlessScroll from "vue-seamless-scroll";
+import vueSeamlessScroll from "vue-seamless-scroll/src";
 @Options({
   components: {
     vueSeamlessScroll,

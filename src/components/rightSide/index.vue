@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 15:07:04
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 15:51:45
+ * @LastEditTime: 2021-11-26 18:05:36
  * @FilePath: /zhjt/src/components/rightSide/index.vue
 -->
 <template>
@@ -10,7 +10,8 @@
     <dv-border-box-12
       :reverse="true"
       class="l-side__abnormal__content silde-right__item"
-      backgroundColor="rgba(20,87,140, 0.29)"
+        backgroundColor="rgba(16,68,113, 0.2)"
+
     >
       <!-- 工作量标题 -->
 
@@ -88,7 +89,8 @@
       :reverse="true"
       style="margin-top: 20px"
       class="l-side__abnormal__content silde-right__item"
-      backgroundColor="rgba(20,87,140, 0.29)"
+        backgroundColor="rgba(16,68,113, 0.2)"
+
     >
       <span class="oil-title">里程数监控</span>
       <div class="oli-chart">
@@ -104,7 +106,8 @@
       :reverse="true"
       style="margin-top: 20px"
       class="l-side__abnormal__content silde-right__item"
-      backgroundColor="rgba(20,87,140, 0.29)"
+        backgroundColor="rgba(16,68,113, 0.2)"
+
     >
       <div class="work">
         <!-- 工作效率 -->
