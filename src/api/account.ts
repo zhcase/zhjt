@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-11-04 13:33:12
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 20:55:02
+ * @LastEditTime: 2021-11-27 17:05:44
  * @FilePath: /zhjt/src/api/account.ts
  */
 import request from "../config/request";

@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-29 09:37:49
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 18:51:48
+ * @LastEditTime: 2021-11-27 14:28:06
  * @FilePath: /zhjt/src/views/Home.vue
 -->
 <template>
@@ -14,7 +14,7 @@
     </div>
     <!-- 地图 内容 -->
     <div class="jt__content">
-      <Content @handleViewMore='handleMoreClick' />
+      <Content @handleViewMore='handleMoreClick' @closeLoading='closeLoading' @openLoading='openLoading' />
     </div>
     <!-- 图表内容 -->
     <div class="jt__container">
@@ -27,10 +27,10 @@
 
     <!-- 弹出地图层 -->
     <div class="dialog-map" v-if="isMap">
-      <map-dialog @closeDialog='closeDialog' @closeLoading='closeLoading'></map-dialog>
+      <map-dialog @closeDialog='closeDialog' @closeLoading='closeLoading' @openLoading='openLoading'></map-dialog>
     </div>
     <!-- </dv-border-box-1> -->
-    <!-- <Loading v-if="isShowLoading" /> -->
+    <Loading v-if="isShowLoading" />
   </div>
 </template>
 
@@ -56,8 +56,8 @@ import Loading from '@/components/loading/index'
   },
 })
 export default class Home extends Vue {
-isMap=true;
-isShowLoading=false;
+isMap=false;
+isShowLoading=true;
 closeDialog(){
   this.isMap=false;
 }
@@ -71,6 +71,10 @@ handleMoreClick(){
 closeLoading(){
     this.isShowLoading=false; //关闭Loading
 
+}
+// 打开loading
+openLoading(){
+    this.isShowLoading=true; //打开Loading
 }
 
 }

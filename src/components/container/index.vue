@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:18:52
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 18:05:23
+ * @LastEditTime: 2021-11-27 17:07:54
  * @FilePath: /zhjt/src/components/container/index.vue
 -->
 <template>
@@ -10,14 +10,14 @@
     <dv-border-box-12
       :reverse="true"
       class="l-side__abnormal__content yd-echart-container__item"
-        backgroundColor="rgba(16,68,113, 0.2)"
+      backgroundColor="rgba(16,68,113, 0.2)"
     >
       <span class="box-title">今日出勤量</span>
       <div class="d-container">
         <div class="item">
           <span class="img"><img src="@/assets/images/you@2x.png" /></span>
           <span class="num" v-if="attendanceConfig.personnel">
-          {{ attendanceConfig.personnel }}%</span
+            {{ attendanceConfig.personnel }}%</span
           >
           <span class="text">人员出勤</span>
         </div>
@@ -37,11 +37,10 @@
       :reverse="true"
       style="margin-top: 20px"
       class="l-side__abnormal__content yd-echart-container__item"
-        backgroundColor="rgba(16,68,113, 0.2)"
-
+      backgroundColor="rgba(16,68,113, 0.2)"
     >
       <span class="oil-title">油量监控</span>
-      <div class="oli-chart" style="height:80%">
+      <div class="oli-chart" style="height: 80%">
         <div
           id="oliChart"
           ref="oliChart"
@@ -53,11 +52,10 @@
       :reverse="true"
       style="margin-top: 20px"
       class="l-side__abnormal__content yd-echart-container__item"
-        backgroundColor="rgba(16,68,113, 0.2)"
-
+      backgroundColor="rgba(16,68,113, 0.2)"
     >
       <span class="oil-title"> <i></i> 近期日低频使用</span>
-      <div class="oli-chart" style="margin-top:20px;height:100%">
+      <div class="oli-chart" style="margin-top: 20px; height: 100%">
         <div id="CarChart" style="margin-top: 0px"></div>
       </div>
     </dv-border-box-12>
@@ -846,31 +844,19 @@ export default class Container extends Vue {
     //   月份: "Feb.",
     //   月均降雨量: 28.8,
     // },
-    this.carDatas=[];
-    let result =await Account.getMonitorData('LIST_LOW_FREQUENCY_VEHICLE');
+    this.carDatas = [];
+    let result = await Account.getMonitorData("LIST_LOW_FREQUENCY_VEHICLE");
     console.log(result);
-    console.log('hello');
-    for(let item of result.data){
-      console.log(item);
-      this.carDatas.push(  
-         {
-      name: '英里',
-      月份: item.orgName,
-      月均降雨量: item.totalMile,
-    }
-    )
-        this.carDatas.push(  
-         {
-      name: '总时间',
-      月份: item.orgName,
-      月均降雨量: item.totalTime,
-    }
-    )
-      
+    console.log("hello");
+    for (let item of result.data) {
+      this.carDatas.push({
+        name: "低频车量数",
+        月份: item.orgName,
+        月均降雨量: item.num,
+      });
     }
     //  this.carDatas=result.data;
-     
-    
+
     let stackedColumnPlot: any = new Column("CarChart", {
       data: this.carDatas,
       isGroup: true,
@@ -880,7 +866,7 @@ export default class Container extends Vue {
       yField: "月均降雨量",
       seriesField: "name",
       /** 设置颜色 */
-      color: ["#4195E3FF", "#FC41A8FF"],
+      color: ["#FC41A8FF", "#4195E3FF"],
       // textStyle: {},
       legend: {
         textStyle: {
@@ -925,17 +911,17 @@ export default class Container extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.yd-echart-container{
-    display: flex;
-    
-    height: 96%;
-    // height: auto;
-        flex-direction:column;
-        &__item{
-          //  flex: 0 0 auto;
-                      // flex-grow: 1 ;
-                        flex: 1;
-        }
+.yd-echart-container {
+  display: flex;
+
+  height: 96%;
+  // height: auto;
+  flex-direction: column;
+  &__item {
+    //  flex: 0 0 auto;
+    // flex-grow: 1 ;
+    flex: 1;
+  }
 }
 .d-container {
   display: flex;
@@ -945,7 +931,7 @@ export default class Container extends Vue {
 
   .item {
     flex: 1;
-    margin-top:30px;
+    margin-top: 30px;
     span {
       display: inline-block;
     }

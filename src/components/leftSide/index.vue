@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-29 11:27:01
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 18:49:24
+ * @LastEditTime: 2021-11-27 18:04:18
  * @FilePath: /zhjt/src/components/leftSide/index.vue
 -->
 <template>
@@ -40,7 +40,7 @@
             l-side__abnormal__content__warning
           "
         >
-          <dv-scroll-board :config="warningConfig" />
+          <dv-scroll-board :config="warningConfig" ref="scrollBoard" />
         </div>
       </dv-border-box-12>
       <!-- OBD拔出警告 -->
@@ -117,11 +117,15 @@ export default class Home extends Vue {
   };
   //车辆异常配置
   abnormalConfig = {
-    header: ["项目驻点", "车牌", "出车记录", "总行驶里程"], //["项目驻点", "车牌", "出车记录", "处理情况"]
+    header: ["项目驻点", "车牌", "出车", "总里程"], //["项目驻点", "车牌", "出车记录", "处理情况"]
     headerBGC: "linear-gradient(0deg, #38a0d6, #6DCDE6)",
     evenRowBGC: "rgba(109, 205, 230, 0.2)",
     oddRowBGC: "rgba(109, 205, 230, 0)",
+    columnWidth:[110,95,50],
     columnHeight: [20],
+    mouseover(){
+
+    },
     data: [
       // ["西安项目", "豫A3256", "无", "联系司机"],
       // ["广州项目", "粤B342", "无", "联系管理员"],
@@ -137,22 +141,28 @@ export default class Home extends Vue {
   };
   // 安全驾驶告警
   warningConfig = {
-    header: ["项目名称", "驻点", "车牌", "告警详情"],
+    header: ["项目-驻点", "车牌", "告警详情"],
     headerBGC: "rgba(31, 147, 190, 1)",
     evenRowBGC: "rgba(109, 205, 230, 0)",
     oddRowBGC: "rgba(109, 205, 230, 0)",
+    columnWidth:[150,95],
     data: [],
   };
   mounted() {
     this.getObdWarning();
     this.timer = setInterval(this.scrollAnimate, 1500);
-
+      
     // 每五秒种获取安全驾驶与出车异常数据
     setInterval(() => {
       this.handleCatchCarData();
       this.getWarningAlarm();
     }, 5000);
   }
+  updateRows(rows, index) {
+  // ...
+  console.log(rows);
+  console.log(index);
+}
   filterList(arr, filterId) {
     const id = filterId; //这里定义按照过滤的对象的属性名称,你想要过滤的那个对象属性
     // const id = 'name' //试一下name
@@ -183,12 +193,13 @@ export default class Home extends Vue {
     for (let i = 0; i < result.data.list.length; i++) {
       let dataList = result.data.list[i];
       this.warningConfig.data[this.warningConfig.data.length] = [
-        dataList.subDeptName,
-        dataList.deptName,
+        dataList.subDeptName+'-'+dataList.deptName,
         dataList.vehicleCard,
         dataList.alarmType,
       ];
     }
+          // this.$refs["scrollBoard"].updateRows(rows, index)
+
   }
   // 处理出车异常数据
   async handleCatchCarData() {
@@ -208,7 +219,7 @@ export default class Home extends Vue {
       this.abnormalConfig.data[this.abnormalConfig.data.length] = [
         dataList.subDeptName,
         dataList.vehicleCard,
-        dataList.reason,
+        dataList.carOutNum,
         dataList.totalMileage + "KM",
       ];
     }
@@ -244,6 +255,9 @@ export default class Home extends Vue {
 .animate-up {
   transition: all 0.5s ease-in-out;
   transform: translateY(-30px);
+}
+/deep/ .dv-scroll-board .header .header-item{
+    font-size: 13px;
 }
 .l-side {
   margin-left: 0;
@@ -378,6 +392,7 @@ export default class Home extends Vue {
         /deep/ .rows {
           .row-item {
             height: 25px;
+            font-size: 11px;
           }
           .row-item:nth-child(odd) {
           }

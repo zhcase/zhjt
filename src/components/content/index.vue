@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:15:10
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 16:23:20
+ * @LastEditTime: 2021-11-27 16:11:09
  * @FilePath: /zhjt/src/components/content/index.vue
 -->
 <template>
@@ -147,7 +147,12 @@
       <ul>
         <li><img src="@/assets/images/car-icon.png" /> 车辆分布</li>
         <li><img src="@/assets/images/work-icon1.png" /> 工作量分布</li>
-        <li @click="handleMoreClick">查看更多内容>></li>
+        <li class="btn" @click="handleMoreClick" v-if="!isProvince">
+          查看更多内容>>
+        </li>
+        <li class="btn" @click="handleBackMap" v-if="isProvince">
+          返回上一级 &lt;&lt;
+        </li>
       </ul>
     </div>
 
@@ -163,8 +168,12 @@
     <div class="video-dialog">
       <!-- <VideoPlayer/> -->
     </div>
-    <div class="user-info" style="position: absolute; top: 50px" v-if="false">
-      <userDetail />
+    <div
+      class="user-info"
+      style="position: absolute; top: 150px"
+      v-if="isShowWorkDetail"
+    >
+      <userDetail :datas="workDetailInfo"  @close='closeDialog'/>
     </div>
   </div>
 </template>
@@ -194,9 +203,13 @@ export default class Container extends Vue {
   // 坐标对应的值
   currentTime = [];
   arrmap = [];
+  workDetailInfo={};//存储工作量详情
 
   isMap = true;
+  isProvince = false; //判断是否是省级
   info = ""; //获取弹出信息
+  isShowWorkDetail = false; // 是否显示工作量详情
+
   // 地图坐标
   cyfztx_date_n = {
     geoCoordMap: {}, //配置现在所需要的地图
@@ -222,6 +235,18 @@ export default class Container extends Vue {
     ],
   };
 
+  // 返回上一级图地图
+  handleBackMap() {
+    this.isProvince = false;
+    this.$emit("openLoading"); // 开启Loading
+    setTimeout(() => {
+      this.initMap();
+    }, 100);
+  }
+  // 关闭弹出
+  closeDialog(){
+    this.isShowWorkDetail=false;
+  }
   // 获取当前时间
   getCurrentDate() {
     let d = new Date();
@@ -239,7 +264,7 @@ export default class Container extends Vue {
     return [`${year}-${month}-${day}`, `${hour}:${minute}:${second}`];
   }
   created() {
-    window.handleShowInfo = this.handleShowInfos;
+    window.handleShowInfo = this.handleShowInfo;
   }
   mounted() {
     // this.initMap();
@@ -249,11 +274,11 @@ export default class Container extends Vue {
     }, 1000);
   }
 
-/**
- * 点击查看更多
- */
-  handleMoreClick(){
-    this.$emit('handleViewMore')
+  /**
+   * 点击查看更多
+   */
+  handleMoreClick() {
+    this.$emit("handleViewMore");
   }
   // 获取车辆位置  重构数据给与到map 地图点
 
@@ -294,9 +319,9 @@ export default class Container extends Vue {
 
     this.initMap();
   }
-
-  handleShowInfos() {
-    alert(1232);
+  // 显示详情
+  handleShowInfo() {
+    this.isShowWorkDetail = true;
   }
   convertData(data) {
     // var res = [];
@@ -317,7 +342,6 @@ export default class Container extends Vue {
   }
   async getCarInfo(id) {
     let result = await Account.getMonitorData("GET_VEHICLE_LOCATION", 0, 0, id);
-
     let data = result.data;
     this.info = data;
   }
@@ -336,7 +360,6 @@ export default class Container extends Vue {
     var datemap = this.cyfztx_date_n.geoCoordMap;
     var datevalue = this.cyfztx_date_n.BJData;
     let workMapData = this.cyfztx_date_n.workSelectPoint;
-    console.log(workMapData);
     // var convertData = function (
     //   datemap: { [x: string]: any },
     //   datevalue: string | any[]
@@ -619,6 +642,7 @@ export default class Container extends Vue {
             ).then((results) => {
               let data = results.data;
               console.log(data);
+              this.workDetailInfo=data;
               res = `
               <div>
        
@@ -634,7 +658,7 @@ export default class Container extends Vue {
           <div style="height: 80px; width: 100%; display: flex">
             <div style="height: 60px; width: 60px; margin-top: 10px">
               <img
-                src="https://img1.baidu.com/it/u=1765464561,3100748160&fm=26&fmt=auto"
+                src="http://auto.wintaotel.com.cn/CommController/showImg?imgPath=z:/image_file/dpicon/icon_1-30.png"
                 style="height: 60px; border-radius: 5px"
               />
             </div>
@@ -647,8 +671,8 @@ export default class Container extends Vue {
               "
             >
               <ul style="margin-top: 10px">
-                <li style='text-align:left'>&nbsp; ${data.userName} </li>
-                <li style='text-align:left'> &nbsp; ${data.createTime}</li>
+                <li style='text-align:left'>&nbsp;${data.userName} </li>
+                <li> &nbsp; ${data.createTime}</li>
                 <li style="font-weight: 400;text-align:left">
                  &nbsp; ${data.orgName}
                 </li>
@@ -660,7 +684,7 @@ export default class Container extends Vue {
               <li style="float: left; color: #fff">
                 <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
                   车牌号: </span
-                >${data.vehicleCard?data.vehicleCard:'未使用车辆'}
+                >${data.vehicleCard ? data.vehicleCard : "无"}
               </li>
               <li style="float: left; margin-left: 20px;color: #fff">
                 <span style="color: rgba(7, 224, 183, 1); font-weight: bold">
@@ -672,13 +696,12 @@ export default class Container extends Vue {
                   维护信息: </span
                 >${data.maintenance}
               </li>
+              <li style="float: left;margin-top:10px;color: #fff;cursor:pointer;color:rgba(255, 251, 7, 1)" onclick='handleShowInfo()'>点击查看详细信息 》 》</li>
             </ul>
           </div>
         </div>
-      </div>
-              `;
-                          callback(ticket, res);
-
+      </div>`;
+              callback(ticket, res);
             });
           } else {
             this.getCarInfo(params.data.id);
@@ -704,7 +727,7 @@ export default class Container extends Vue {
           <div style="height: 80px; width: 100%; display: flex">
             <div style="height: 60px; width: 60px; margin-top: 10px">
               <img
-                src="https://img1.baidu.com/it/u=1765464561,3100748160&fm=26&fmt=auto"
+                src="http://auto.wintaotel.com.cn/CommController/showImg?imgPath=z:/image_file/dpicon/icon_1-3087.png"
                 style="height: 60px; border-radius: 5px"
               />
             </div>
@@ -717,8 +740,8 @@ export default class Container extends Vue {
               "
             >
               <ul style="margin-top: 10px">
-                <li style='text-align:left'>&nbsp; ${data.staffname} </li>
-                <li style='text-align:left'>&nbsp; ${data.vehicleCard}</li>
+                <li style='text-align:left;text-align:left'>&nbsp; ${data.staffname} </li>
+                <li style='text-align:left;text-align:left'>&nbsp; ${data.vehicleCard}</li>
                 <li style="font-weight: 400; ">
                  &nbsp; ${data.date}
                 </li>
@@ -870,6 +893,7 @@ export default class Container extends Vue {
     // console.log(myChart.addMarkPoint(11,22));
     // console.log(option);
     option && myChart.setOption(option, true);
+    this.$emit("closeLoading");
     let that = this;
     //点击前解绑，防止点击事件触发多次
     myChart.on("click", function (params) {
@@ -877,16 +901,20 @@ export default class Container extends Vue {
       if (params.data) {
         return;
       }
-      if (option.geo.isLeaf) {
+      if (that.isProvince) {
         return;
       }
+      that.$emit("openLoading"); // 开启Loading
       axios.get(`/json/${params.name}.json`).then((res) => {
         echarts.registerMap(params.name, res);
         option.geo.map = params.name;
-        option.geo.isLeaf = true;
         option.geo.layoutSize = "80%";
-        this.isMap = false;
+        // that.isMap = false;
+        that.isProvince = true;
         option && myChart.setOption(option);
+        setTimeout(() => {
+          that.$emit("closeLoading"); // 关闭Loading
+        }, 100);
       });
     });
   }
@@ -900,6 +928,7 @@ export default class Container extends Vue {
     color: "#fff";
     width: 350px;
     margin: 20px auto;
+    
     li {
       color: #fff;
       margin-left: 15px;
@@ -915,7 +944,7 @@ export default class Container extends Vue {
       }
     }
     ul {
-      li:last-child {
+      .btn {
         height: 37px;
         margin-left: 20px;
         width: 120px;
@@ -929,6 +958,7 @@ export default class Container extends Vue {
         background-image: url("~@/assets/images/bg-btn.png");
         background-size: 120px 37px;
       }
+
       li {
         float: left;
       }

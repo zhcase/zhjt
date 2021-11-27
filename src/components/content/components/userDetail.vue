@@ -2,18 +2,23 @@
  * @Author: zeHua
  * @Date: 2021-11-18 09:55:13
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-26 20:47:27
+ * @LastEditTime: 2021-11-27 15:13:16
  * @FilePath: /zhjt/src/components/content/components/userDetail.vue
 -->
 <template>
   <dv-border-box-11
     title="详情内容"
-    style="height: auto; width: 500px"
+    style="height: auto; width: 500px;position:relative"
     backgroundColor="rgba(15, 46, 132, 0.77)"
   >
-   <!-- 人员信息 -->
+  <span clas='close'
+  @click='handleClose'
+   style="position: absolute;
+    right:-25px;
+    cursor:pointer;
+    top:10px;"> <img src="@/assets/images/close-icon.png"/> </span>
+    <!-- 人员信息 -->
     <div class="user-content">
-     
       <div class="personnel-info">
         <div class="title">
           <img src="@/assets/images/yellow-title.png" />人员信息
@@ -22,20 +27,19 @@
           <div class="role">上报人：</div>
           <div class="desc">
             <ul>
-              <li>{{datas.userName}}</li>
-              <li>{{datas.createTime}}</li>
-              <li>{{datas.orgName}}</li>
-                            <li>{{datas.maintenance}}</li>
-
+              <li>{{ datas.userName }}</li>
+              <li>{{ datas.createTime }}</li>
+              <li>{{ datas.orgName }}</li>
+              <li>{{ datas.maintenance }}</li>
             </ul>
           </div>
           <!-- <div style="color: rgba(236, 67, 174, 1)">登高证/电工证</div> -->
         </div>
-         <div class="content">
+        <div class="content">
           <div class="role">配合人：</div>
           <div class="desc">
             <ul>
-                           <li>{{datas.workStaffName}}</li>
+              <li>{{ datas.workStaffName }}</li>
 
               <!-- <li>13888888888</li>
               <li>xx去--xx项目--xx事情</li> -->
@@ -43,7 +47,7 @@
           </div>
           <!-- <div style="color: rgba(236, 67, 174, 1)">登高证/电工证</div> -->
         </div>
-          <!-- <div class="content">
+        <!-- <div class="content">
           <div class="role">配合人：</div>
           <div class="desc">
             <ul>
@@ -52,16 +56,22 @@
               <li>xx去--xx项目--xx事情</li>
             </ul>
           </div> -->
-          <!-- <div style="color: rgba(236, 67, 174, 1)">登高证/电工证</div> -->
+        <!-- <div style="color: rgba(236, 67, 174, 1)">登高证/电工证</div> -->
         <!-- </div> -->
-        <div class="title" style="margin-top:30px">
+        <div class="title" style="margin-top: 30px">
           <img src="@/assets/images/yellow-title.png" />工作内容
         </div>
-        <div class="desc" style="color:rgba(180, 241, 255, 1);padding:0 10px;text-align:left">
-           <p> {{datas.workContent}}</p>
-           
+        <div
+          class="desc"
+          style="
+            color: rgba(180, 241, 255, 1);
+            padding: 0 10px;
+            text-align: left;
+          "
+        >
+          <p>{{ datas.workContent }}</p>
         </div>
-          <!-- <div class="title" style="margin-top:30px">
+        <!-- <div class="title" style="margin-top:30px">
           <img src="@/assets/images/yellow-title.png" />工作进程
         </div> -->
         <!-- <div class="desc" style="color:rgba(180, 241, 255, 1);padding:0 10px;text-align:left">
@@ -73,7 +83,7 @@
            <p>xx时xx分xx秒 ，出车，驾驶车辆粤B0001，司机王五 xx</p>
 
         </div> -->
-          <!-- <div class="title" style="margin-top:30px">
+        <!-- <div class="title" style="margin-top:30px">
           <img src="@/assets/images/yellow-title.png" />工作结果
         </div>
         <div class="desc" style="color:rgba(180, 241, 255, 1);padding:0 10px;text-align:left">
@@ -84,33 +94,36 @@
 
         </div> -->
       </div>
-    
+
       <!-- 配合人 -->
-      
     </div>
   </dv-border-box-11>
 </template>
 
 <script lang="ts">
-import { Vue, Options} from "vue-class-component";
+import { Vue, Options } from "vue-class-component";
 @Options({
   props: {
-    datas: Object
-  }
+    datas: Object,
+  },
 })
 export default class userDetail extends Vue {
-  datas=''
-  mounted(){
+  datas = "";
+  mounted() {
     console.log(this.datas);
-    
   }
-
+  handleClose(){
+    this.$emit('close')
+  }
 }
 </script>
 
 <style lang="scss" scoped>
+.close{
+    
+}
 .user-content {
-  padding: 60px 20px 20px 20px;
+  padding: 60px 20px 60px 20px;
   .personnel-info {
     .title {
       color: rgba(255, 251, 7, 1);
