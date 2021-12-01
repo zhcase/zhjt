@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:15:10
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-27 16:11:09
+ * @LastEditTime: 2021-11-28 15:11:48
  * @FilePath: /zhjt/src/components/content/index.vue
 -->
 <template>
@@ -658,7 +658,7 @@ export default class Container extends Vue {
           <div style="height: 80px; width: 100%; display: flex">
             <div style="height: 60px; width: 60px; margin-top: 10px">
               <img
-                src="http://auto.wintaotel.com.cn/CommController/showImg?imgPath=z:/image_file/dpicon/icon_1-30.png"
+                src="https://image.wintaotel.com.cn/icon_1-30.png"
                 style="height: 60px; border-radius: 5px"
               />
             </div>
@@ -727,7 +727,7 @@ export default class Container extends Vue {
           <div style="height: 80px; width: 100%; display: flex">
             <div style="height: 60px; width: 60px; margin-top: 10px">
               <img
-                src="http://auto.wintaotel.com.cn/CommController/showImg?imgPath=z:/image_file/dpicon/icon_1-3087.png"
+                src="https://image.wintaotel.com.cn/icon_1-3087.png"
                 style="height: 60px; border-radius: 5px"
               />
             </div>

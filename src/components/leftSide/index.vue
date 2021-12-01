@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-29 11:27:01
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-27 18:04:18
+ * @LastEditTime: 2021-11-28 15:25:20
  * @FilePath: /zhjt/src/components/leftSide/index.vue
 -->
 <template>
@@ -65,8 +65,8 @@
                 <ul>
                   <li class="obd-item" v-for="(item, index) in obdCarConifg.obdDataList" :key="index">
                     <div class="obd-item-cell">
-                      <span class="k">({{item.vehicleCard || '--'}})</span>
-                      <span class="v">OBD拔出</span>
+                      <span class="k">{{item.vehicleCard || '--'}}</span>
+                      <!-- <span class="v">OBD拔出</span> -->
                     </div>
                     <div class="obd-item-cell" v-show="item.staffName && item.deptName">
                       <span class="k">{{item.staffName}}</span>
@@ -141,11 +141,11 @@ export default class Home extends Vue {
   };
   // 安全驾驶告警
   warningConfig = {
-    header: ["项目-驻点", "车牌", "告警详情"],
+    header: ["组织", "车牌", "告警详情"],
     headerBGC: "rgba(31, 147, 190, 1)",
     evenRowBGC: "rgba(109, 205, 230, 0)",
     oddRowBGC: "rgba(109, 205, 230, 0)",
-    columnWidth:[150,95],
+    columnWidth:[143],
     data: [],
   };
   mounted() {
@@ -193,7 +193,8 @@ export default class Home extends Vue {
     for (let i = 0; i < result.data.list.length; i++) {
       let dataList = result.data.list[i];
       this.warningConfig.data[this.warningConfig.data.length] = [
-        dataList.subDeptName+'-'+dataList.deptName,
+        // dataList.subDeptName,
+        dataList.deptName,
         dataList.vehicleCard,
         dataList.alarmType,
       ];
@@ -329,8 +330,8 @@ export default class Home extends Vue {
                 text-align: left;
                 white-space: nowrap;
                 word-break: keep-all;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                // overflow: hidden;
+                // text-overflow: ellipsis;
               }
               .v {
                 margin-left: 5px;

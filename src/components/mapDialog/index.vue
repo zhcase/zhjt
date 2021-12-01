@@ -2,17 +2,21 @@
  * @Author: zeHua
  * @Date: 2021-11-19 17:14:34
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-27 17:30:02
+ * @LastEditTime: 2021-12-01 10:13:34
  * @FilePath: /zhjt/src/components/mapDialog/index.vue
 -->
 <template>
   <!-- 卫星地图 -->
   <div class="satellite-map">
+    <!-- 加载 -->
+    <div class="transparent-loading" v-if="isHideLoading" @click="()=>{return}">
+      <span> <img src="@/assets/images/loading-tm.gif" /> </span>
+    </div>
     <!-- 展示mark点 -->
     <div class="mark-view">
       <ul>
         <li><img src="@/assets/images/car-icon.png" />车辆</li>
-        <li><img src="@/assets/images/work-icon.png" />工作量</li>
+        <li><img src="@/assets/images/work-icon1.png" />工作量</li>
         <li><img src="@/assets/images/oli-icon.png" />油机</li>
         <li><img src="@/assets/images/people-icon.png" />保障人员</li>
       </ul>
@@ -60,6 +64,7 @@
               <switchs
                 style="margin-top: 10px"
                 :value="peopleStatus"
+                color="#ff3439"
                 text="on|off"
                 @change="peopleChange"
               ></switchs>
@@ -71,13 +76,14 @@
             </div>
             <div class="content" v-if="isCloseContent">
               <div class="name">工作车辆</div>
-              <div class="num">在线数量 {{ carIds.length }}</div>
+              <div class="num">出车数量 {{ carIds.length }}</div>
             </div>
             <div class="right">
               <span>
                 <switchs
                   :value="carStatus"
                   @change="carChange"
+                  color="#e10ec5"
                   text="on|off"
                 ></switchs
               ></span>
@@ -96,6 +102,7 @@
                 <switchs
                   :value="workStatus"
                   @change="workChange"
+                  color="#00a0fb"
                   text="on|off"
                 ></switchs
               ></span>
@@ -114,6 +121,7 @@
                 <switchs
                   :value="oliStatus"
                   @change="oliChange"
+                  color="#ffaa42"
                   text="on|off"
                 ></switchs
               ></span>
@@ -146,7 +154,7 @@ import userDetail from "@/components/content/components/userDetail.vue";
 import switchs from "@/components/switch/index.vue";
 var goodsData = require("../../assets/json/geo.json"); //导入设置好的主题颜色 如果不需要，可以不做此操作
 const iconImg = require("@/assets/images/car-icon.png");
-const workIcon = require("@/assets/images/work-icon.png");
+const workIcon = require("@/assets/images/work-icon1.png");
 const oliIcon = require("@/assets/images/oli-icon.png");
 const peopleIcon = require("@/assets/images/people-icon.png");
 
@@ -160,10 +168,12 @@ export default class Container extends Vue {
   ak = "jsug1ccNL9hyeZInNcfAN8f4qG65SyYx"; //ak秘钥
   timer = "";
   toggle = false;
+  mapLoading = false;
   isCloseContent = true; // 关闭内容
   isShowWorkDetail = false; // 是否显示工作量详情
   workDetailInfo = {}; //存储工作量详情
   currentTime = [];
+  isHideLoading = false; // loading 隐藏
   peopleStatus = true; // 人员保障状态
   oliStatus = true; //油机状态
   workStatus = true; //工作量状态
@@ -223,15 +233,18 @@ export default class Container extends Vue {
   // 修改车辆状态
   carChange(status) {
     this.carStatus = status;
-    this.$emit("openLoading");
+    this.isHideLoading = true;
+
     if (!status) {
       setTimeout(() => {
         for (let item of this.map.getOverlays()) {
           if (this.carIds.indexOf(item._config.id) > -1) {
+            // setTimeout(() => {
             this.map.removeOverlay(item);
+            // });
           }
         }
-        this.$emit("closeLoading");
+                    this.isHideLoading = false;
       }, 300);
     } else {
       this.getCarAddress();
@@ -241,14 +254,16 @@ export default class Container extends Vue {
   // 修改工作量状态
   workChange(status) {
     this.workStatus = status;
+    this.isHideLoading = true;
     if (!status) {
       for (let item of this.map.getOverlays()) {
         if (this.workIds.indexOf(item._config.id) > -1) {
           setTimeout(() => {
-            this.map.removeOverlay(item);
+          this.map.removeOverlay(item);
           });
         }
       }
+      this.isHideLoading = false;
     } else {
       this.getWorkAddress();
     }
@@ -291,21 +306,53 @@ export default class Container extends Vue {
         );
         let data = result.data;
         // this.filterMarker(e.target.point, index);
-        let content = `<div>
-          
+        let content = `<div style='position:relative;'>
+          <i style='position:absolute;right:0;top:0px'><img style='height:35px;display:${
+            data.alarmStatus == 0 ? "none !important" : "block !important"
+          }' src='https://image.wintaotel.com.cn/danger-icon.png'/></i>
+           <div
+             style="
+              width: 242px;
+            height: 35px;
+            text-indent:1rem;
+            background:${
+              data.alarmStatus == 0 ? " rgba(25, 193, 206, 1)" : "#DB2105"
+            };
+            font-size: 16px;
+            font-family: Microsoft YaHei;
+            font-weight: bold;
+            color: #ffffff;
+            line-height: 35px;
+            margin-bottom: 2px;
+          "
+        >
+          电子工牌信息 <span style='font-size:13px;margin-left:10px'> ${
+            data.clockStatus
+          } </span>
+
+        </div>
         <div
           style="
             width: 326px;
             height: 180px;
             padding: 20px;
-            border: 2px solid #07DBEB;
-            background: rgba(39, 137, 143, 0.7);
+            border: 2px solid ${
+              data.alarmStatus == 0
+                ? " rgba(39, 137, 143, 1)"
+                : "rgba(219, 33, 5, 1)"
+            };
+            background:${
+              data.alarmStatus == 0
+                ? " rgba(39, 137, 143, 0.7)"
+                : "rgba(219, 33, 5, 0.7)"
+            };
           "
         >
+        
           <div style="height: 80px; width: 100%; display: flex">
             <div style="height: 60px; width: 60px; margin-top: 10px">
               <img
-                src="http://auto.wintaotel.com.cn/CommController/showImg?imgPath=z:/image_file/dpicon/icon_1-309.png"
+                src="https://image.wintaotel.com.cn/icon_1-309.png"
                 style="height: 60px; border-radius: 5px"
               />
             </div>
@@ -334,11 +381,11 @@ export default class Container extends Vue {
                 >${data.company}
               </li>
               <li style="float: left; color: #fff;width:50%"">
-                <span style="color: rgba(7, 224, 183, 1); font-weight: bold;>
+                <span style="color: rgba(7, 224, 183, 1); font-weight: bold;">
                   高度: </span
                 >${data.altitude}
               </li>
-              <li style="float: left; margin-left: 20px;color: #fff;width:50%;margin-top:10px">
+              <li style="float: left; color: #fff;width:50%;">
                 <span style="color: rgba(7, 224, 183, 1); font-weight: bold;width:50%">
                   方向度: </span
                 >${data.direction}
@@ -382,35 +429,34 @@ export default class Container extends Vue {
     let splitNum = carList.length / 300; //每次请求300个
     let num = 1; //计数器
     let number = 0;
+    this.carIds = [];
     for (let i = 0; i < Math.ceil(splitNum); i++) {
       num += 1;
       if (num > Math.ceil(splitNum)) {
-        setTimeout(() => {
-          this.$emit("closeLoading");
-        }, 1000);
         break;
       }
       setTimeout(() => {
         for (let item of result.data.splice(number, number + 300)) {
-          this.carIds.push(item.vehicleCard);
-          marker = new BMapGL.Marker(
-            new BMapGL.Point(item.longitude, item.latitude),
-            {
-              icon: myIcon,
-              id: item.vehicleCard,
-            }
-          );
-          this.map.addOverlay(marker);
-          marker.addEventListener("click", async (e) => {
-            let result = await Account.getMonitorData(
-              "GET_VEHICLE_LOCATION",
-              0,
-              0,
-              e.currentTarget._config.id
+          setTimeout(() => {
+            this.carIds.push(item.vehicleCard);
+            marker = new BMapGL.Marker(
+              new BMapGL.Point(item.longitude, item.latitude),
+              {
+                icon: myIcon,
+                id: item.vehicleCard,
+              }
             );
-            let data = result.data;
-            // this.filterMarker(e.target.point, index);
-            let content = `<div>
+            this.map.addOverlay(marker);
+            marker.addEventListener("click", async (e) => {
+              let result = await Account.getMonitorData(
+                "GET_VEHICLE_LOCATION",
+                0,
+                0,
+                e.currentTarget._config.id
+              );
+              let data = result.data;
+              // this.filterMarker(e.target.point, index);
+              let content = `<div>
          
        
         <div
@@ -425,7 +471,7 @@ export default class Container extends Vue {
           <div style="height: 80px; width: 100%; display: flex">
             <div style="height: 60px; width: 60px; margin-top: 10px">
               <img
-                src="http://auto.wintaotel.com.cn/CommController/showImg?imgPath=z:/image_file/dpicon/icon_1-3087.png"
+                src="https://image.wintaotel.com.cn/icon_1-3087.png"
                 style="height: 60px; border-radius: 5px"
               />
             </div>
@@ -474,19 +520,22 @@ export default class Container extends Vue {
           </div>
         </div>
       </div>`;
-            var infoWindow = new BMapGL.InfoWindow(content, opts);
-            this.map.openInfoWindow(
-              infoWindow,
-              new BMapGL.Point(
-                e.currentTarget.latLng.lng,
-                e.currentTarget.latLng.lat
-              )
-            );
-          });
+              var infoWindow = new BMapGL.InfoWindow(content, opts);
+              this.map.openInfoWindow(
+                infoWindow,
+                new BMapGL.Point(
+                  e.currentTarget.latLng.lng,
+                  e.currentTarget.latLng.lat
+                )
+              );
+            });
+          }, 0);
         }
-
         number += 300;
-      }, 5);
+      }, 0);
+      setTimeout(() => {
+        this.isHideLoading = false;
+      }, 300);
       // 关闭loading
     }
   }
@@ -502,29 +551,29 @@ export default class Container extends Vue {
     let workResult = await Account.getMonitorData("LIST_WORKLOAD_LOCATION");
     this.workIds = [];
     for (let item of workResult.data) {
-      // setTimeout(() => {
-      marker = new BMapGL.Marker(
-        new BMapGL.Point(item.longitude, item.latitude),
-        {
-          icon: workIcons,
-          tableSuffix: item.tableSuffix,
-          id: item.id,
-        }
-      );
-      this.workIds.push(item.id);
-      marker.addEventListener("click", async (e) => {
-        let result = await Account.getMonitorData(
-          "GET_WORKLOAD_LOCATION",
-          0,
-          0,
-          undefined,
-          e.currentTarget._config.tableSuffix,
-          e.currentTarget._config.id
+      setTimeout(() => {
+        marker = new BMapGL.Marker(
+          new BMapGL.Point(item.longitude, item.latitude),
+          {
+            icon: workIcons,
+            tableSuffix: item.tableSuffix,
+            id: item.id,
+          }
         );
-        let data = result.data;
-        this.workDetailInfo = data;
-        // this.filterMarker(e.target.point, index);
-        let content = `<div>
+        this.workIds.push(item.id);
+        marker.addEventListener("click", async (e) => {
+          let result = await Account.getMonitorData(
+            "GET_WORKLOAD_LOCATION",
+            0,
+            0,
+            undefined,
+            e.currentTarget._config.tableSuffix,
+            e.currentTarget._config.id
+          );
+          let data = result.data;
+          this.workDetailInfo = data;
+          // this.filterMarker(e.target.point, index);
+          let content = `<div>
        
         <div
           style="
@@ -538,7 +587,7 @@ export default class Container extends Vue {
           <div style="height: 80px; width: 100%; display: flex">
             <div style="height: 60px; width: 60px; margin-top: 10px">
               <img
-                src="http://auto.wintaotel.com.cn/CommController/showImg?imgPath=z:/image_file/dpicon/icon_1-30.png"
+                src="https://image.wintaotel.com.cn/icon_1-30.png"
                 style="height: 60px; border-radius: 5px"
               />
             </div>
@@ -581,19 +630,22 @@ export default class Container extends Vue {
           </div>
         </div>
       </div>`;
-        var infoWindow = new BMapGL.InfoWindow(content, opts);
-        this.map.openInfoWindow(
-          infoWindow,
-          new BMapGL.Point(
-            e.currentTarget.latLng.lng,
-            e.currentTarget.latLng.lat
-          )
-        );
-      });
+          var infoWindow = new BMapGL.InfoWindow(content, opts);
+          this.map.openInfoWindow(
+            infoWindow,
+            new BMapGL.Point(
+              e.currentTarget.latLng.lng,
+              e.currentTarget.latLng.lat
+            )
+          );
+        });
 
-      this.map.addOverlay(marker);
-      // }, 5);
+        this.map.addOverlay(marker);
+      }, 0);
     }
+    setTimeout(() => {
+      this.isHideLoading = false;
+    }, 300);
   }
   // 获取油机位置
   async oliAddress() {
@@ -644,7 +696,7 @@ export default class Container extends Vue {
           <div style="height: 80px; width: 100%; display: flex">
             <div style="height: 60px; width: 60px; margin-top: 10px">
               <img
-                src="http://auto.wintaotel.com.cn/CommController/showImg?imgPath=z:/image_file/dpicon/icon_1-309874.png"
+                src="https://image.wintaotel.com.cn/icon_1-309874.png"
                 style="height: 60px; border-radius: 5px"
               />
             </div>
@@ -766,10 +818,14 @@ map.addOverlay(marker);
 
       //   console.log(BMapGL);
       this.map = new BMapGL.Map("allmap"); // 创建Map实例
-
+      let that = this;
       this.map.centerAndZoom(new BMapGL.Point(113.82, 38.07), 5); // 初始化地图,设置中心点坐标和地图级别
       this.map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
       this.map.setMapType(BMAP_EARTH_MAP); // 设置地图类型为地球模式
+      // 地图加载完毕
+      this.map.addEventListener("tilesloaded", () => {
+        that.$emit("closeLoading");
+      });
       // map.setDisplayOptions({
       //   skyColors: ["rgba(186, 0, 255, 0)", "rgba(186, 0, 255, 0.2)"],
       // });
@@ -794,22 +850,50 @@ map.addOverlay(marker);
       var marker1 = new BMapGL.Marker(new BMapGL.Point(116.404, 39.925));
       // 创建图标
       var marker;
-      //获取车辆位置
-      this.getCarAddress();
+      setTimeout(() => {
+        //获取车辆位置
+        this.getCarAddress();
 
-      // 获取工作量
-      this.getWorkAddress();
+        // // 获取工作量
+        this.getWorkAddress();
 
-      //  获取油机位置
-      this.oliAddress();
-      // 获取工牌位置
-      this.getPeopleAddress();
+        // //  获取油机位置
+        this.oliAddress();
+        // // 获取工牌位置
+        this.getPeopleAddress();
+      }, 5000);
     });
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.transparent-loading {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  z-index: 99999;
+  line-height: 100px;
+  background: rgba(0, 0, 0, 0.2);
+  top: 0;
+  left: 0;
+  margin-top: -100px;
+  margin-left: -50px;
+  span {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    // background: rgba(255,255,255,0.2);
+    top: 50%;
+    margin-top: -100px;
+    left: 50%;
+    margin-left: -50px;
+    display: inline-block;
+    img {
+    }
+  }
+}
 @keyframes mymove {
   100% {
     background: linear-gradient(0deg, #1a46f7 0%, #22f7ff 0%);
@@ -876,14 +960,14 @@ map.addOverlay(marker);
     right: 100px;
     height: 25px;
     line-height: 25px;
-    color:#fff;
-    z-index:999;
+    color: #fff;
+    z-index: 999;
     text-align: left;
     top: 150px;
-    img{
+    img {
       height: 15px;
       float: left;
-      margin-top:5px;
+      margin-top: 5px;
       margin-right: 10px;
     }
   }

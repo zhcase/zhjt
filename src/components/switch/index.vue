@@ -2,16 +2,17 @@
  * @Author: zeHua
  * @Date: 2021-11-25 15:29:37
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-25 20:42:41
+ * @LastEditTime: 2021-11-29 11:41:41
  * @FilePath: /zhjt/src/components/switch/index.vue
 -->
 <template>
   <div>
     <span
-      class="weui-switch"
+       class="weui-switch"
       :class="{ 'weui-switch-on': isChecked }"
       :value="value"
       @click="toggle"
+      :style="{'--color':color}"
       style="position: relative"
     >
       <div
@@ -22,6 +23,7 @@
           position: absolute;
           padding: 0 5px;
           line-height: 20px;
+          text-align:left;
           color: #fff;
           user-select: none;
         "
@@ -59,6 +61,10 @@ export default {
       type: String,
       default: "",
     },
+    color:{
+      type:String,
+      default:"#409eff"
+    }
   },
   data() {
     return {
@@ -133,7 +139,7 @@ export default {
 }
 .weui-switch-on:before {
   border-color: #1aad19;
-  background-color: #409eff;
+  background-color: var(--color);
 }
 .weui-switch-on:after {
   transform: translateX(28px);

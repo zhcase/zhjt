@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-29 09:37:49
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-27 14:28:06
+ * @LastEditTime: 2021-11-28 11:25:10
  * @FilePath: /zhjt/src/views/Home.vue
 -->
 <template>
@@ -37,6 +37,7 @@
 <script>
 
 import { Options, Vue } from "vue-class-component";
+import { BMPGL } from "@/config/bmpgl.js";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import LeftSide from "@/components/leftSide/index.vue"; //左侧内容
 import Content from "@/components/content/index.vue"; //左侧内容
@@ -58,6 +59,12 @@ import Loading from '@/components/loading/index'
 export default class Home extends Vue {
 isMap=false;
 isShowLoading=true;
+
+
+mounted(){
+  // 提前加载地图脚本
+    BMPGL('jsug1ccNL9hyeZInNcfAN8f4qG65SyYx')
+}
 closeDialog(){
   this.isMap=false;
 }

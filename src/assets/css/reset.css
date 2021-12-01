@@ -2,6 +2,13 @@
 body,html,#app{
     height: 100%;
     width: 100%;
+
+}
+@font-face {
+    font-family: 'YouSheBiaoTiHei';
+    src: url('../font/YouSheBiaoTiHei.ttf');
+    font-weight: normal;
+    font-style: normal;
 }
 body {
     font-family:arial,helvetica,sans-serif;
