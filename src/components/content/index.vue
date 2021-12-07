@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:15:10
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-28 15:11:48
+ * @LastEditTime: 2021-12-06 15:39:37
  * @FilePath: /zhjt/src/components/content/index.vue
 -->
 <template>
@@ -173,7 +173,7 @@
       style="position: absolute; top: 150px"
       v-if="isShowWorkDetail"
     >
-      <userDetail :datas="workDetailInfo"  @close='closeDialog'/>
+      <userDetail :datas="workDetailInfo" @close="closeDialog" />
     </div>
   </div>
 </template>
@@ -203,8 +203,9 @@ export default class Container extends Vue {
   // 坐标对应的值
   currentTime = [];
   arrmap = [];
-  workDetailInfo={};//存储工作量详情
-
+  myChart = ""; //地图
+  workDetailInfo = {}; //存储工作量详情
+  option = {}; // echarts 图表配置
   isMap = true;
   isProvince = false; //判断是否是省级
   info = ""; //获取弹出信息
@@ -244,8 +245,8 @@ export default class Container extends Vue {
     }, 100);
   }
   // 关闭弹出
-  closeDialog(){
-    this.isShowWorkDetail=false;
+  closeDialog() {
+    this.isShowWorkDetail = false;
   }
   // 获取当前时间
   getCurrentDate() {
@@ -272,6 +273,15 @@ export default class Container extends Vue {
     setInterval(() => {
       this.currentTime = this.getCurrentDate();
     }, 1000);
+
+    // setTimeout(() => {
+    //   setInterval(() => {
+    //     this.getCarAddress(false, [0]);
+    //     setTimeout(() => {
+    //       this.getCarAddress(false, [1]);
+    //     }, 60000);
+    //   }, 60000);
+    // }, 60000);
   }
 
   /**
@@ -280,9 +290,13 @@ export default class Container extends Vue {
   handleMoreClick() {
     this.$emit("handleViewMore");
   }
-  // 获取车辆位置  重构数据给与到map 地图点
 
-  async getCarAddress() {
+  /**
+   * 获取车辆位置  重构数据给与到map 地图点
+   * @param isInitData 是否是第一次初始化
+   * @param upadateArr 更新数据 车辆与工作量
+   */
+  async getCarAddress(isInitData = true, upadateArr = [0, 1]) {
     this.cyfztx_date_n.carSelectPoint = [];
     this.cyfztx_date_n.workSelectPoint = [];
     // 车辆位置分布
@@ -316,8 +330,9 @@ export default class Container extends Vue {
       };
       // this.cyfztx_date_n.workSelectPoint.push(workData[i].id);
     }
-
-    this.initMap();
+    // if (isInitData) {
+    this.initMap(upadateArr);
+    // }
   }
   // 显示详情
   handleShowInfo() {
@@ -345,8 +360,12 @@ export default class Container extends Vue {
     let data = result.data;
     this.info = data;
   }
-  // 初始化展示地图
-  initMap(name) {
+
+  /**
+   * 初始化展示地图
+   * @param upadateArr 更新数组
+   */
+  initMap(upadateArr) {
     this.isMap = true;
     // if (name) {
     // echarts.registerMap("china", beijing);
@@ -356,10 +375,11 @@ export default class Container extends Vue {
 
     //   console.log($);
     var chartDom = this.$refs.map;
-    var myChart = echarts.init(document.getElementById("map"));
+    this.myChart = echarts.init(document.getElementById("map"));
     var datemap = this.cyfztx_date_n.geoCoordMap;
     var datevalue = this.cyfztx_date_n.BJData;
     let workMapData = this.cyfztx_date_n.workSelectPoint;
+    let names=['工作量','车辆'];
     // var convertData = function (
     //   datemap: { [x: string]: any },
     //   datevalue: string | any[]
@@ -555,95 +575,102 @@ export default class Container extends Vue {
     */
 
     // console.log( this.arrmap);
-    series[1] = {
-      type: "scatter",
-      coordinateSystem: "geo",
-      zlevel: 2,
-      large: true,
-      rippleEffect: {
-        period: 4,
-        brushType: "stroke",
-        scale: 4,
-      },
+    // 车辆
+    if (upadateArr.indexOf(1) > -1) {
+      series[1] = {
+        name:'车辆',
+        type: "scatter",
+        coordinateSystem: "geo",
+        zlevel: 2,
+        large: true,
+        rippleEffect: {
+          period: 4,
+          brushType: "stroke",
+          scale: 4,
+        },
 
-      symbol: "",
-      symbolSize: 5,
-      itemStyle: {
-        normal: {
-          show: true,
-          color: "#a316f1",
+        symbol: "",
+        symbolSize: 5,
+        itemStyle: {
+          normal: {
+            show: true,
+            color: "#a316f1",
+          },
+          emphasis: {
+            show: true,
+            color: "#a316f1",
+          },
         },
-        emphasis: {
-          show: true,
-          color: "#a316f1",
-        },
-      },
-      data: this.cyfztx_date_n.carSelectPoint,
-    };
+        data: this.cyfztx_date_n.carSelectPoint,
+      };
+    }
     // console.log(this.cyfztx_date_n.carSelectPoint);
     // console.log(this.cyfztx_date_n);
-    series[0] = {
-      type: "scatter",
-      dataType: "work",
-      coordinateSystem: "geo",
-      zlevel: 2,
-      rippleEffect: {
-        period: 4,
-        brushType: "stroke",
-        scale: 4,
-      },
+    // 工作量
+    if (upadateArr.indexOf(0) > -1) {
+      series[0] = {
+        type: "scatter",
+        name:'工作量',
+        dataType: "work",
+        coordinateSystem: "geo",
+        zlevel: 2,
+        rippleEffect: {
+          period: 4,
+          brushType: "stroke",
+          scale: 4,
+        },
 
-      symbol: "",
-      symbolSize: 5,
-      itemStyle: {
-        normal: {
-          show: true,
-          color: "#0598FE",
+        symbol: "",
+        symbolSize: 5,
+        itemStyle: {
+          normal: {
+            show: true,
+            color: "#0598FE",
+          },
+          emphasis: {
+            show: true,
+            color: "#0598FE",
+          },
         },
-        emphasis: {
-          show: true,
-          color: "#0598FE",
-        },
-      },
-      data: this.cyfztx_date_n.workSelectPoint,
-    };
+        data: this.cyfztx_date_n.workSelectPoint,
+      };
+    }
     var svg =
       "path://M32.597,9.782 L30.475,11.904 C30.085,12.294 29.452,12.294 29.061,11.904 C28.671,11.513 28.671,10.880 29.061,10.489 L31.182,8.368 C31.573,7.978 32.206,7.978 32.597,8.368 C32.987,8.759 32.987,9.392 32.597,9.782 ZM30.000,30.500 C30.000,31.328 29.329,32.000 28.500,32.000 L5.500,32.000 C4.672,32.000 4.000,31.328 4.000,30.500 C4.000,29.672 4.672,29.000 5.500,29.000 L8.009,29.000 L8.009,18.244 C8.009,13.139 12.034,9.000 17.000,9.000 C21.966,9.000 25.992,13.139 25.992,18.244 L25.992,29.000 L28.500,29.000 C29.329,29.000 30.000,29.672 30.000,30.500 ZM17.867,14.444 L13.000,22.000 L17.000,22.000 L17.133,26.556 L21.000,20.000 L17.000,20.000 L17.867,14.444 ZM25.221,6.327 C25.033,6.846 24.459,7.113 23.940,6.924 C23.421,6.735 23.153,6.162 23.342,5.643 L24.368,2.823 C24.557,2.304 25.131,2.037 25.650,2.226 C26.169,2.415 26.436,2.989 26.248,3.508 L25.221,6.327 ZM17.000,5.000 C16.448,5.000 16.000,4.552 16.000,4.000 L16.000,1.000 C16.000,0.448 16.448,0.000 17.000,0.000 C17.552,0.000 18.000,0.448 18.000,1.000 L18.000,4.000 C18.000,4.552 17.552,5.000 17.000,5.000 ZM10.028,7.197 C9.509,7.386 8.935,7.118 8.746,6.599 L7.720,3.780 C7.532,3.261 7.799,2.687 8.318,2.498 C8.837,2.309 9.411,2.577 9.600,3.096 L10.626,5.915 C10.815,6.434 10.547,7.008 10.028,7.197 ZM3.354,12.268 L1.232,10.146 C0.842,9.756 0.842,9.123 1.232,8.732 C1.623,8.342 2.256,8.342 2.646,8.732 L4.768,10.854 C5.158,11.244 5.158,11.877 4.768,12.268 C4.377,12.658 3.744,12.658 3.354,12.268 Z";
-
-    var option = {
-      backgroundColor: "rgba(34, 52, 164, 0)",
-      // dataZoom: { show: true, realtime: false }, //实时刷新 type: 'inside', start: 0, end: 10, xAxisIndex: [0] }
-      large: true,
-      largeThreshold: 500,
-
-      tooltip: {
-        trigger: "item",
-        triggerOn: "click", //点击才会出现提示框
+    if (!this.option.tooltip) {
+      this.option = {
         backgroundColor: "rgba(34, 52, 164, 0)",
-        borderColor: "rgba(0,0,0,0)",
-        // borderWidth: 0.5,
-        showDelay: 0,
-        hideDelay: 0,
-        enterable: true,
-        transitionDuration: 0,
-        extraCssText: "z-index:100",
-        formatter: (params, ticket, callback) => {
-          //根据业务自己拓展要显示的内容
-          var res = "";
-          console.log(params);
-          if (params.data.type == "work") {
-            Account.getMonitorData(
-              "GET_WORKLOAD_LOCATION",
-              0,
-              0,
-              undefined,
-              params.data.tableSuffix,
-              params.data.id
-            ).then((results) => {
-              let data = results.data;
-              console.log(data);
-              this.workDetailInfo=data;
-              res = `
+        // dataZoom: { show: true, realtime: false }, //实时刷新 type: 'inside', start: 0, end: 10, xAxisIndex: [0] }
+        large: true,
+        largeThreshold: 500,
+        tooltip: {
+          trigger: "item",
+          triggerOn: "click", //点击才会出现提示框
+          backgroundColor: "rgba(34, 52, 164, 0)",
+          borderColor: "rgba(0,0,0,0)",
+          // borderWidth: 0.5,
+          showDelay: 0,
+          hideDelay: 0,
+          enterable: true,
+          transitionDuration: 0,
+          extraCssText: "z-index:100",
+          formatter: (params, ticket, callback) => {
+            //根据业务自己拓展要显示的内容
+            var res = "";
+            console.log(params);
+            if (params.data.type == "work") {
+              Account.getMonitorData(
+                "GET_WORKLOAD_LOCATION",
+                0,
+                0,
+                undefined,
+                params.data.tableSuffix,
+                params.data.id
+              ).then((results) => {
+                let data = results.data;
+                console.log(data);
+                this.workDetailInfo = data;
+                res = `
               <div>
        
         <div
@@ -701,18 +728,18 @@ export default class Container extends Vue {
           </div>
         </div>
       </div>`;
-              callback(ticket, res);
-            });
-          } else {
-            this.getCarInfo(params.data.id);
-            Account.getMonitorData(
-              "GET_VEHICLE_LOCATION",
-              0,
-              0,
-              params.data.id
-            ).then((results) => {
-              let data = results.data;
-              res = `<div>
+                callback(ticket, res);
+              });
+            } else {
+              this.getCarInfo(params.data.id);
+              Account.getMonitorData(
+                "GET_VEHICLE_LOCATION",
+                0,
+                0,
+                params.data.id
+              ).then((results) => {
+                let data = results.data;
+                res = `<div>
      
        
         <div
@@ -740,8 +767,12 @@ export default class Container extends Vue {
               "
             >
               <ul style="margin-top: 10px">
-                <li style='text-align:left;text-align:left'>&nbsp; ${data.staffname} </li>
-                <li style='text-align:left;text-align:left'>&nbsp; ${data.vehicleCard}</li>
+                <li style='text-align:left;text-align:left'>&nbsp; ${
+                  data.staffname
+                } </li>
+                <li style='text-align:left;text-align:left'>&nbsp; ${
+                  data.vehicleCard
+                }</li>
                 <li style="font-weight: 400; ">
                  &nbsp; ${data.date}
                 </li>
@@ -777,126 +808,147 @@ export default class Container extends Vue {
         </div>
       </div>`;
 
-              // }
-              callback(ticket, res);
-            });
-          }
+                // }
+                callback(ticket, res);
+              });
+            }
 
-          // let data = result.data;
-          // this.info = data;
-          // var name = params.name;
-          // var value = params.value[2];
-          // if (name != "") {
-          return "查询中...";
-        },
-      },
-      // visualMap: {
-      //图例值控制
-      // show: false,
-      // type: "piecewise",
-      // pieces: [
-      //   {
-      //     max: 5,
-      //     color: "#e67817",
-      //   },
-      //   {
-      //     min: 5,
-      //     max: 10,
-      //     color: "red",
-      //   },
-      //   {
-      //     min: 10,
-      //     color: "#a316f1",
-      //   },
-      // ],
-      // calculable: false,
-      // },
-      geo: {
-        map: "china",
-        show: true,
-        label: {
-          emphasis: {
-            show: false,
-            textStyle: {
-              borderWidth: 0.5,
-              color: "#fff",
-            },
+            // let data = result.data;
+            // this.info = data;
+            // var name = params.name;
+            // var value = params.value[2];
+            // if (name != "") {
+            return "查询中...";
           },
         },
-        roam: false, //是否允许缩放
-        zoom: 1,
-        layoutCenter: ["48%", "40%"], //地图位置
-        layoutSize: "90%",
-        itemStyle: {
-          normal: {
-            borderColor: "rgba(147, 235, 248, 1)",
-            borderWidth: 0.5,
-            areaColor: {
-              type: "radial",
-              x: 0.5,
-              y: 0.5,
-              r: 0.8,
-              colorStops: [
-                {
-                  offset: 0,
-                  color: "rgba(147, 235, 248, 0)", // 0% 处的颜色
-                },
-                {
-                  offset: 1,
-                  color: "rgba(147, 235, 248, .2)", // 100% 处的颜色
-                },
-              ],
-              borderWidth: 0.5,
-              globalCoord: true, // 缺省为 false
-            },
-            shadowColor: "rgba(128, 217, 248, 1)",
-            // shadowColor: 'rgba(255, 255, 255, 1)',
-            shadowOffsetX: -2,
-            shadowOffsetY: 2,
-            shadowBlur: 10,
-          },
-        },
-        // itemStyle: {
-        //   normal: {
-        //     show: "true",
-        //     areaColor: "#031525",
-        //     borderColor: "#FFFFFF",
-
-        //     // color: "rgba(34, 52, 164, 0.3)", //地图背景色
-        //     // borderColor: "#5bc1c9", //省市边界线
+        // visualMap: {
+        //图例值控制
+        // show: false,
+        // type: "piecewise",
+        // pieces: [
+        //   {
+        //     max: 5,
+        //     color: "#e67817",
         //   },
-        //   emphasis: {
-        //     // show: "true",
-        //     // color: "rgba(37, 43, 61, .5)", //悬浮背景
-        //     areaColor: "#2B91B7",
+        //   {
+        //     min: 5,
+        //     max: 10,
+        //     color: "red",
         //   },
+        //   {
+        //     min: 10,
+        //     color: "#a316f1",
+        //   },
+        // ],
+        // calculable: false,
         // },
-      },
-      legend: {
-        orient: "horizontal",
-        left: "center",
-        // align: 'right',
-        data: [
-          { name: "进口", icon: svg },
-          { name: "出口", icon: svg },
-        ],
-        textStyle: {
-          color: "#fff",
-          fontSize: 20,
+        geo: {
+          map: "china",
+          show: true,
+          label: {
+            emphasis: {
+              show: false,
+              textStyle: {
+                borderWidth: 0.5,
+                color: "#fff",
+              },
+            },
+          },
+          roam: false, //是否允许缩放
+          zoom: 1,
+          layoutCenter: ["48%", "40%"], //地图位置
+          layoutSize: "90%",
+          itemStyle: {
+            normal: {
+              borderColor: "rgba(147, 235, 248, 1)",
+              borderWidth: 0.5,
+              areaColor: {
+                type: "radial",
+                x: 0.5,
+                y: 0.5,
+                r: 0.8,
+                colorStops: [
+                  {
+                    offset: 0,
+                    color: "rgba(147, 235, 248, 0)", // 0% 处的颜色
+                  },
+                  {
+                    offset: 1,
+                    color: "rgba(147, 235, 248, .2)", // 100% 处的颜色
+                  },
+                ],
+                borderWidth: 0.5,
+                globalCoord: true, // 缺省为 false
+              },
+              shadowColor: "rgba(128, 217, 248, 1)",
+              // shadowColor: 'rgba(255, 255, 255, 1)',
+              shadowOffsetX: -2,
+              shadowOffsetY: 2,
+              shadowBlur: 10,
+            },
+          },
+          // itemStyle: {
+          //   normal: {
+          //     show: "true",
+          //     areaColor: "#031525",
+          //     borderColor: "#FFFFFF",
+
+          //     // color: "rgba(34, 52, 164, 0.3)", //地图背景色
+          //     // borderColor: "#5bc1c9", //省市边界线
+          //   },
+          //   emphasis: {
+          //     // show: "true",
+          //     // color: "rgba(37, 43, 61, .5)", //悬浮背景
+          //     areaColor: "#2B91B7",
+          //   },
+          // },
         },
-        itemWidth: 50,
-        itemHeight: 30,
-        selectedMode: "multiple",
-      },
-      series: series,
-    };
+        legend: {
+          orient: "horizontal",
+          left: "center",
+          // align: 'right',
+          data: [
+            { name: "进口", icon: svg },
+            { name: "出口", icon: svg },
+          ],
+          textStyle: {
+            color: "#fff",
+            fontSize: 20,
+          },
+          itemWidth: 50,
+          itemHeight: 30,
+          selectedMode: "multiple",
+        },
+        series: series,
+      };
+    }
     // console.log(myChart.addMarkPoint(11,22));
     // console.log(option);
-    option && myChart.setOption(option, true);
+    // console.log([{
+    //           name:names[upadateArr[0]],
+    //           data:this.cyfztx_date_n.workSelectPoint
+    //         }]);
+          this.option && this.myChart.setOption(this.option, true);
+
+    // if (upadateArr.length > 1) {
+    //   this.option && this.myChart.setOption(this.option, true);
+    // } else {
+    //   console.log();
+    //   this.option &&
+    //     this.myChart.setOption(
+    //       {
+    //         series:[{
+    //           name:names[upadateArr[0]],
+    //           data:this.cyfztx_date_n.workSelectPoint
+    //         }]
+    //       },
+    //       true
+    //     );
+    // }
     this.$emit("closeLoading");
     let that = this;
     //点击前解绑，防止点击事件触发多次
-    myChart.on("click", function (params) {
+    this.myChart.on("click", function (params) {
       console.log(params);
       if (params.data) {
         return;
@@ -907,11 +959,13 @@ export default class Container extends Vue {
       that.$emit("openLoading"); // 开启Loading
       axios.get(`/json/${params.name}.json`).then((res) => {
         echarts.registerMap(params.name, res);
-        option.geo.map = params.name;
-        option.geo.layoutSize = "80%";
+        this.option.geo.map = params.name;
+        this.option.geo.layoutSize = "80%";
         // that.isMap = false;
         that.isProvince = true;
-        option && myChart.setOption(option);
+        this.$nextTicket(() => {
+          this.option && this.myChart.setOption(this.option, false);
+        });
         setTimeout(() => {
           that.$emit("closeLoading"); // 关闭Loading
         }, 100);
@@ -928,7 +982,7 @@ export default class Container extends Vue {
     color: "#fff";
     width: 350px;
     margin: 20px auto;
-    
+
     li {
       color: #fff;
       margin-left: 15px;

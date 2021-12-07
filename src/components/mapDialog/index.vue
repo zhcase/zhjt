@@ -2,24 +2,32 @@
  * @Author: zeHua
  * @Date: 2021-11-19 17:14:34
  * @LastEditors: zeHua
- * @LastEditTime: 2021-12-01 10:13:34
+ * @LastEditTime: 2021-12-07 14:58:14
  * @FilePath: /zhjt/src/components/mapDialog/index.vue
 -->
 <template>
   <!-- 卫星地图 -->
   <div class="satellite-map">
     <!-- 加载 -->
-    <div class="transparent-loading" v-if="isHideLoading" @click="()=>{return}">
+    <div
+      class="transparent-loading"
+      v-if="isHideLoading"
+      @click="
+        () => {
+          return;
+        }
+      "
+    >
       <span> <img src="@/assets/images/loading-tm.gif" /> </span>
     </div>
     <!-- 展示mark点 -->
     <div class="mark-view">
-      <ul>
+      <!-- <ul>
         <li><img src="@/assets/images/car-icon.png" />车辆</li>
         <li><img src="@/assets/images/work-icon1.png" />工作量</li>
         <li><img src="@/assets/images/oli-icon.png" />油机</li>
         <li><img src="@/assets/images/people-icon.png" />保障人员</li>
-      </ul>
+      </ul> -->
     </div>
     <!-- 头部导航 -->
     <div class="top-nav">
@@ -172,11 +180,13 @@ export default class Container extends Vue {
   isCloseContent = true; // 关闭内容
   isShowWorkDetail = false; // 是否显示工作量详情
   workDetailInfo = {}; //存储工作量详情
+  carData = {}; //车辆数据
+  carLength = 0; //车辆数据长度
   currentTime = [];
   isHideLoading = false; // loading 隐藏
-  peopleStatus = true; // 人员保障状态
-  oliStatus = true; //油机状态
-  workStatus = true; //工作量状态
+  peopleStatus = false; // 人员保障状态
+  oliStatus = false; //油机状态
+  workStatus = false; //工作量状态
   carStatus = true; // 车辆状态
   map = "";
   oliIds = []; //存储油机标识
@@ -204,6 +214,7 @@ export default class Container extends Vue {
    */
   peopleChange(status) {
     this.peopleStatus = status;
+    console.log(this.peopleIds);
     if (!status) {
       for (let item of this.map.getOverlays()) {
         if (this.peopleIds.indexOf(item._config.id) > -1) {
@@ -231,20 +242,24 @@ export default class Container extends Vue {
     }
   }
   // 修改车辆状态
-  carChange(status) {
+  carChange(status, upadateStatus) {
     this.carStatus = status;
     this.isHideLoading = true;
-
+    // || status === 3
     if (!status) {
       setTimeout(() => {
+        // let carIds = JSON.parse(JSON.stringify(this.carIds));
+        // if (upadateStatus) {
+        //   this.getCarAddress();
+        // }
         for (let item of this.map.getOverlays()) {
           if (this.carIds.indexOf(item._config.id) > -1) {
-            // setTimeout(() => {
-            this.map.removeOverlay(item);
-            // });
+            setTimeout(() => {
+              this.map.removeOverlay(item);
+            });
           }
         }
-                    this.isHideLoading = false;
+        this.isHideLoading = false;
       }, 300);
     } else {
       this.getCarAddress();
@@ -259,7 +274,7 @@ export default class Container extends Vue {
       for (let item of this.map.getOverlays()) {
         if (this.workIds.indexOf(item._config.id) > -1) {
           setTimeout(() => {
-          this.map.removeOverlay(item);
+            this.map.removeOverlay(item);
           });
         }
       }
@@ -274,7 +289,10 @@ export default class Container extends Vue {
   }
 
   // 获取电子工牌位置
-  async getPeopleAddress() {
+  async getPeopleAddress(updateStatus) {
+    if (!this.peopleStatus) {
+      return;
+    }
     var opts = {
       width: 382,
       height: 320,
@@ -284,6 +302,13 @@ export default class Container extends Vue {
     let peopleIcons = new BMapGL.Icon(peopleIcon, new BMapGL.Size(10, 10)); // 电子工牌图标
     let peopleResult = await Account.getMonitorData("LIST_PERSONNEL_LOCATION");
     let marker;
+    if (!updateStatus) {
+      for (let item of this.map.getOverlays()) {
+        if (this.peopleIds.indexOf(item._config.id) > -1) {
+          this.map.removeOverlay(item);
+        }
+      }
+    }
     this.peopleIds = [];
     for (let item of peopleResult.data) {
       marker = new BMapGL.Marker(
@@ -414,8 +439,15 @@ export default class Container extends Vue {
     }
   }
 
-  // 获取工作车辆位置
-  async getCarAddress() {
+  /**
+   *  获取工作车辆位置
+   * @param updateState 是否更新状态
+   */
+  async getCarAddress(updateState) {
+    if (!this.carStatus) {
+      return;
+    }
+
     var opts = {
       width: 382,
       height: 320,
@@ -425,38 +457,148 @@ export default class Container extends Vue {
     var myIcon = new BMapGL.Icon(iconImg, new BMapGL.Size(10, 10)); // 车辆图标
     let marker;
     let result = await Account.getMonitorData("LIST_VEHICLE_LOCATION");
+    this.carLength = result.data.length;
     let carList = result.data;
     let splitNum = carList.length / 300; //每次请求300个
     let num = 1; //计数器
     let number = 0;
+    let carData = [];
+    // 如果是更新 将不会重置 合集
+    if (updateState) {
+      for (let item of this.map.getOverlays()) {
+        if (this.carIds.indexOf(item._config.id) > -1) {
+          setTimeout(() => {
+            this.map.removeOverlay(item);
+          });
+        }
+      }
+    }
     this.carIds = [];
+
     for (let i = 0; i < Math.ceil(splitNum); i++) {
       num += 1;
       if (num > Math.ceil(splitNum)) {
         break;
       }
       setTimeout(() => {
-        for (let item of result.data.splice(number, number + 300)) {
-          setTimeout(() => {
-            this.carIds.push(item.vehicleCard);
-            marker = new BMapGL.Marker(
-              new BMapGL.Point(item.longitude, item.latitude),
-              {
-                icon: myIcon,
-                id: item.vehicleCard,
-              }
-            );
-            this.map.addOverlay(marker);
-            marker.addEventListener("click", async (e) => {
-              let result = await Account.getMonitorData(
-                "GET_VEHICLE_LOCATION",
-                0,
-                0,
-                e.currentTarget._config.id
-              );
-              let data = result.data;
-              // this.filterMarker(e.target.point, index);
-              let content = `<div>
+        this.$nextTick(() => {
+          for (let item of carList.splice(number, number + 300)) {
+            let info = JSON.parse(JSON.stringify(this.carData))[
+              item.vehicleCard
+            ];
+
+            setTimeout(() => {
+              if (Number(item.longitude) !== 0 && Number(item.latitude) !== 0) {
+                setTimeout(() => {
+                  this.carIds.push(item.vehicleCard);
+                  if (!updateState) {
+                    carData[item.vehicleCard] = {
+                      longitude: item.longitude,
+                      latitude: item.latitude,
+                    };
+                  }
+                  marker = new BMapGL.Marker(
+                    new BMapGL.Point(item.longitude, item.latitude),
+                    {
+                      icon: myIcon,
+                      id: item.vehicleCard,
+                    }
+                  );
+                  // 如果是更新状态
+                  // if (updateState) {
+                  //   // if (item.vehicleCard === "京A9FR35") {
+                  //   //   this.$nextTick(() => {
+                  //   //     console.log(
+                  //   //       JSON.parse(JSON.stringify(this.carData))["京A9FR35"]
+                  //   //     );
+                  //   //     console.log(item.vehicleCard);
+                  //   //   });
+                  //   // }
+                  //   // console.log(info);
+                  //   // 判断是否上次有这个车牌号
+
+                  //   if (info) {
+                  //     // 判断上次与这次经纬度是否一致
+                  //     if (
+                  //       info.longitude != item.longitude ||
+                  //       info.latitude != item.latitude
+                  //     ) {
+                  //       // 不等于重新赋值
+                  //       carData[item.vehicleCard] = {
+                  //         longitude: item.longitude,
+                  //         latitude: item.latitude,
+                  //       };
+
+                  //       marker = new BMapGL.Marker(
+                  //         new BMapGL.Point(item.longitude, item.latitude),
+                  //         {
+                  //           icon: myIcon,
+                  //           id: item.vehicleCard,
+                  //         }
+                  //       );
+                  //       let index = this.carIds.indexOf(item.vehicleCard);
+
+                  //       this.carIds.splice(index, 1);
+                  //       this.carIds.push(item.vehicleCard);
+                  //       carData[item.vehicleCard] = {
+                  //         longitude: item.longitude,
+                  //         latitude: item.latitude,
+                  //       };
+                  //       for (let items of this.map.getOverlays()) {
+                  //         if (item.vehicleCard == items._config.id) {
+                  //           setTimeout(() => {
+                  //             this.map.removeOverlay(items);
+                  //           });
+                  //         }
+                  //       }
+                  //     }
+                  //   }
+                  // } else {
+                  //   marker = new BMapGL.Marker(
+                  //     new BMapGL.Point(item.longitude, item.latitude),
+                  //     {
+                  //       icon: myIcon,
+                  //       id: item.vehicleCard,
+                  //     }
+                  //   );
+                  // }
+
+                  // if (updateState) {
+                  //   for (let items of this.map.getOverlays()) {
+                  //     if (items._config.id === item.vehicleCard) {
+                  //       if (
+                  //         items.latLng.lng != item.longitude ||
+                  //         items.latLng.lat != item.latitude
+                  //       ) {
+                  //         setTimeout(() => {
+                  //           this.map.removeOverlay(items);
+                  //           marker = new BMapGL.Marker(
+                  //             new BMapGL.Point(item.longitude, item.latitude),
+                  //             {
+                  //               icon: myIcon,
+                  //               id: item.vehicleCard,
+                  //             }
+                  //           );
+                  //         });
+                  //       }
+                  //     }
+                  //   }
+                  // } else {
+
+                  // }
+                  if (marker) {
+                    this.map.addOverlay(marker);
+                    this.$nextTick(() => {
+                      marker.addEventListener("click", async (e) => {
+                        let result = await Account.getMonitorData(
+                          "GET_VEHICLE_LOCATION",
+                          0,
+                          0,
+                          e.currentTarget._config.id
+                        );
+                        let data = result.data;
+                        // this.filterMarker(e.target.point, index);
+                        let content = `<div>
          
        
         <div
@@ -520,36 +662,73 @@ export default class Container extends Vue {
           </div>
         </div>
       </div>`;
-              var infoWindow = new BMapGL.InfoWindow(content, opts);
-              this.map.openInfoWindow(
-                infoWindow,
-                new BMapGL.Point(
-                  e.currentTarget.latLng.lng,
-                  e.currentTarget.latLng.lat
-                )
-              );
+                        var infoWindow = new BMapGL.InfoWindow(content, opts);
+                        this.map.openInfoWindow(
+                          infoWindow,
+                          new BMapGL.Point(
+                            e.currentTarget.latLng.lng,
+                            e.currentTarget.latLng.lat
+                          )
+                        );
+                      });
+                    });
+                  }
+                }, 0);
+              }
             });
-          }, 0);
-        }
-        number += 300;
+            // 删除不出车的数据
+            let carIndex = this.carData.indexOf(item.vehicleCard);
+            this.carData.splice(carIndex, 1);
+          }
+          number += 300;
+        });
       }, 0);
       setTimeout(() => {
         this.isHideLoading = false;
       }, 300);
       // 关闭loading
     }
+    // 移除改变不出车的数据
+    // this.$nextTick(() => {
+    //   let rmIds = [];
+    //   for (let item in this.carData) {
+    //     rmIds.push(item);
+    //   }
+    //   for (let item of this.map.getOverlays()) {
+    //     if (rmIds.indexOf(item._config.id) > -1) {
+    //       setTimeout(() => {
+    //         this.map.removeOverlay(item);
+    //       });
+    //     }
+    //   }
+    // });
+    this.carData = carData;
   }
   // 获取工作量
-  async getWorkAddress() {
+  async getWorkAddress(updateState) {
+    // 工作量开关没打开
+    if (!this.workStatus) {
+      return;
+    }
     let workIcons = new BMapGL.Icon(workIcon, new BMapGL.Size(10, 10)); //工作量图标
     let marker;
+    if (updateState) {
+      for (let item of this.map.getOverlays()) {
+        if (this.workIds.indexOf(item._config.id) > -1) {
+          setTimeout(() => {
+            this.map.removeOverlay(item);
+          });
+        }
+      }
+    }
     var opts = {
       width: 382,
       height: 320,
       title: "<span style='display:none'></span>",
     };
     let workResult = await Account.getMonitorData("LIST_WORKLOAD_LOCATION");
-    this.workIds = [];
+      this.workIds = [];
+    
     for (let item of workResult.data) {
       setTimeout(() => {
         marker = new BMapGL.Marker(
@@ -639,7 +818,6 @@ export default class Container extends Vue {
             )
           );
         });
-
         this.map.addOverlay(marker);
       }, 0);
     }
@@ -648,9 +826,22 @@ export default class Container extends Vue {
     }, 300);
   }
   // 获取油机位置
-  async oliAddress() {
+  async oliAddress(updateStatus) {
     let marker;
-
+    if (!this.oliStatus) {
+      for (let item of this.map.getOverlays()) {
+        if (this.oliIds.indexOf(item._config.id) > -1) {
+          this.map.removeOverlay(item);
+        }
+      }
+    }
+    if (!updateStatus) {
+      for (let item of this.map.getOverlays()) {
+        if (this.oliIds.indexOf(item._config.id) > -1) {
+          this.map.removeOverlay(item);
+        }
+      }
+    }
     let oliIcons = new BMapGL.Icon(oliIcon, new BMapGL.Size(10, 10)); // 油机图标
     let oliResult = await Account.getMonitorData("LIST_OIL_MACHINE_LOCATION");
     var opts = {
@@ -660,29 +851,30 @@ export default class Container extends Vue {
     };
     this.oliIds = [];
     for (let item of oliResult.data) {
-      marker = new BMapGL.Marker(
-        new BMapGL.Point(item.longitude, item.latitude),
-        {
-          icon: oliIcons,
-          id: item.oilCode,
-        }
-      );
-      this.oliIds.push(item.oilCode);
-      marker.addEventListener("click", async (e) => {
-        let result = await Account.getMonitorData(
-          "GET_OIL_MACHINE_LOCATION",
-          0,
-          0,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          e.currentTarget._config.id
+      if (Number(item.longitude) !== 0 && Number(item.latitude) !== 0) {
+        marker = new BMapGL.Marker(
+          new BMapGL.Point(item.longitude, item.latitude),
+          {
+            icon: oliIcons,
+            id: item.oilCode,
+          }
         );
-        let data = result.data;
+        this.oliIds.push(item.oilCode);
+        marker.addEventListener("click", async (e) => {
+          let result = await Account.getMonitorData(
+            "GET_OIL_MACHINE_LOCATION",
+            0,
+            0,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            e.currentTarget._config.id
+          );
+          let data = result.data;
 
-        // this.filterMarker(e.target.point, index);
-        let content = `<div>
+          // this.filterMarker(e.target.point, index);
+          let content = `<div>
           
         <div
           style="
@@ -747,16 +939,17 @@ export default class Container extends Vue {
           </div>
         </div>
       </div>`;
-        var infoWindow = new BMapGL.InfoWindow(content, opts);
-        this.map.openInfoWindow(
-          infoWindow,
-          new BMapGL.Point(
-            e.currentTarget.latLng.lng,
-            e.currentTarget.latLng.lat
-          )
-        );
-      });
-      this.map.addOverlay(marker);
+          var infoWindow = new BMapGL.InfoWindow(content, opts);
+          this.map.openInfoWindow(
+            infoWindow,
+            new BMapGL.Point(
+              e.currentTarget.latLng.lng,
+              e.currentTarget.latLng.lat
+            )
+          );
+        });
+        this.map.addOverlay(marker);
+      }
     }
   }
   getCurrentDate() {
@@ -775,6 +968,19 @@ export default class Container extends Vue {
     return [`${year}-${month}-${day}`, `${hour}:${minute}:${second}`];
   }
   mounted() {
+    setTimeout(() => {
+      setInterval(() => {
+        this.getCarAddress(true);
+        this.getPeopleAddress(true);
+      }, 300000);
+    }, 300000);
+    setTimeout(() => {
+      setInterval(() => {
+        this.getWorkAddress(true);
+        this.oliAddress(true);
+      }, 400000);
+    }, 400000);
+
     clearInterval(this.timer);
     this.timer = setInterval(() => {
       this.currentTime = this.getCurrentDate();
@@ -855,13 +1061,13 @@ map.addOverlay(marker);
         this.getCarAddress();
 
         // // 获取工作量
-        this.getWorkAddress();
+        // this.getWorkAddress();
 
         // //  获取油机位置
-        this.oliAddress();
+        // this.oliAddress();
         // // 获取工牌位置
-        this.getPeopleAddress();
-      }, 5000);
+        // this.getPeopleAddress();
+      }, 1000);
     });
   }
 }

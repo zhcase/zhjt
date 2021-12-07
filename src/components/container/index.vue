@@ -2,7 +2,7 @@
  * @Author: zeHua
  * @Date: 2021-09-30 10:18:52
  * @LastEditors: zeHua
- * @LastEditTime: 2021-11-27 17:07:54
+ * @LastEditTime: 2021-12-06 18:19:28
  * @FilePath: /zhjt/src/components/container/index.vue
 -->
 <template>
@@ -17,18 +17,25 @@
         <div class="item">
           <span class="img"><img src="@/assets/images/you@2x.png" /></span>
           <span class="num" v-if="attendanceConfig.personnel">
-            {{ attendanceConfig.personnel }}%</span
+            <!-- {{ attendanceConfig.personnel }}% -->
+            98%
+            </span
           >
           <span class="text">人员出勤</span>
         </div>
         <div class="item">
           <span class="img"><img src="@/assets/images/liang@2x.png" /></span>
-          <span class="num">{{ attendanceConfig.vehicle }}%</span>
+          <span class="num">
+            <!-- {{ attendanceConfig.vehicle }}% -->
+            100%
+            </span>
           <span class="text">车辆出勤</span>
         </div>
         <div class="item">
           <span class="img"><img src="@/assets/images/cha@2x.png" /></span>
-          <span class="num">{{ attendanceConfig.oilMachine }}%</span>
+          <span class="num">
+            <!-- {{ attendanceConfig.oilMachine }} -->
+            49%</span>
           <span class="text">油机使用率</span>
         </div>
       </div>
